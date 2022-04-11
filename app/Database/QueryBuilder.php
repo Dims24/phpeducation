@@ -2,9 +2,11 @@
 
 namespace Database;
 
+use Database\Contracts\DatabaseConnectionInterface;
+use Database\Contracts\QueryBuilderInterface;
 use Database\DatabaseConnection;
 
-class QueryBuilder extends DatabaseConnection
+class QueryBuilder implements QueryBuilderInterface
 {
 
     private $fields = [];
@@ -14,16 +16,10 @@ class QueryBuilder extends DatabaseConnection
     private $first = false;
     private string $query;
 
-
-    protected $table;
-    protected $connect;
-
     public function __construct(
-        string $table, $connect)
-    {
-        $this->table = $table;
-        $this->connect = $connect;
-    }
+        protected string $table,
+        protected DatabaseConnectionInterface $connect
+    ) {}
 
 
     public function select(string ...$select): self
