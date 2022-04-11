@@ -15,7 +15,7 @@ $connect= new DatabaseConnection(
 
 $test=new \Database\QueryBuilder("dima", connect: $connect->initConnection());
 
-var_dump($test->select("name")->where("id","(1,'Dima')",operator: "AND")->where("name","Dima","=")->first());
+var_dump($test->select("name")->where("id","(1,'Dima')",type: "AND")->where("name","Dima","=")->first());
 
 
 
