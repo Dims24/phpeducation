@@ -7,15 +7,15 @@ spl_autoload_register(function (string $className) {
 });
 
 $connect= new DatabaseConnection(
-    database: "phptest",
+    database: "dataphp",
     username: "dimaphp",
-    password: "1234");
+    password: "Lbvf1998");
 
 
 
 $test=new \Database\QueryBuilder("dima", connect: $connect->initConnection());
 
-var_dump( $test->select("name")->first());
+var_dump($test->select("name")->where("id","(1,'Dima')",operator: "AND")->where("name","Dima","=")->first());
 
 
 

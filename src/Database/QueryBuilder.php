@@ -8,9 +8,9 @@ class QueryBuilder extends DatabaseConnection
 {
 
     private $fields = [];
-    private $conditions = [];
+    private $whereflag = false;
+    private string $conditions;
     private int $count;
-    private $get1 = false;
     private $first = false;
     private string $query;
 
@@ -23,19 +23,6 @@ class QueryBuilder extends DatabaseConnection
     {
         $this->table = $table;
         $this->connect = $connect;
-    }
-
-    /**
-     * @return string
-     */
-    public function getQuery(): string
-    {
-        return $this->query;
-    }
-
-    public function __toString()
-    {
-        return $this->query;
     }
 
 
@@ -51,14 +38,27 @@ class QueryBuilder extends DatabaseConnection
 
     }
 
-    public function where(string ...$where): self
+    public function where(string $colum, string $meaning, mixed $conditions=null, string $type = ''): self
     {
-        foreach ($where as $arg) {
-            $this->conditions[] = $arg;
+        if (is_null($conditions))
+        {
+            $conditions = '=';
+        }
+        if (empty($this->conditions)) {
+            if ((bool)$type) {
+                $this->conditions = "{$colum} {$conditions} {$meaning} {$type} ";
+            } else {
+                $this->conditions = "{$colum} {$conditions} {$meaning}";
+            }
+        } else {
+            if ((bool)$type) {
+                $this->conditions .= "{$colum} {$conditions} {$meaning} {$type} ";
+            } else {
+                $this->conditions .= "{$colum} {$conditions} {$meaning}";
+            }
         }
         return $this;
     }
-
 
 
     public function toSql(): string
@@ -66,14 +66,15 @@ class QueryBuilder extends DatabaseConnection
 
         $this->query = 'SELECT ' . implode(', ', $this->fields)
             . ' FROM ' . $this->table
-            . ($this->conditions === [] ? '' : ' WHERE ' . implode(' AND ', $this->conditions))
-            . ($this->first == false ? '' : ' LIMIT 1');
+            . (empty($this->conditions) ? "" : ' WHERE ' . $this->conditions)
+            . ($this->first == false ? '' : ' LIMIT 1')
+            . (empty($this->count) ? '' : ' LIMIT ' . $this->count);
         return $this->query;
     }
 
     public function first(): mixed
     {
-        $this->first=true;
+        $this->first = true;
         $this->toSql();
         echo $this->query;
         $c = $this->connect;
