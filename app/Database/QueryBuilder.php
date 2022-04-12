@@ -12,6 +12,7 @@ class QueryBuilder implements QueryBuilderInterface
     private $fields = [];
     private $conditions = [];
     private string $query;
+    private bool $firstflag = false;
 
     public function __construct(
         protected string $table,
@@ -51,15 +52,17 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function toSql(): string
     {
+
         $this->query = 'SELECT ' . implode(', ', $this->fields)
             . ' FROM ' . $this->table
             . (empty($this->conditions) ? "" : ' WHERE ' . implode(' ', $this->conditions))
-            . (function_exists('first') ? "": ' LIMIT 1');
+            . ($this->firstflag==false ? "" : ' LIMIT  1');
         return $this->query;
     }
 
     public function first(): mixed
     {
+        $this->firstflag=true;
         $this->toSql();
         echo $this->query;
         $sth = $this->connection->prepare($this->query);
@@ -71,8 +74,7 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $this->toSql();
         echo $this->query;
-        $sth = $this->connection
-            ->prepare($this->query);
+        $sth = $this->connection->prepare($this->query);
         $sth->execute();
         return $sth->fetchAll();
     }
