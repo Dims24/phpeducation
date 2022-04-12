@@ -32,12 +32,21 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function where(string $column, mixed $operator = null, mixed $value = null, string $boolean = 'AND'): self
     {
-        if (is_null($operator))
+        if (is_null($value))
         {
+            $value = $operator;
             $operator = '=';
         }
+        if(empty($this->conditions)){
+            $this->conditions = array($column => [$boolean,$operator,$value]);
+        }
+        else
+        {
+            $this->conditions[$column] = [$boolean,$value,$operator];
+        }
 
-        $this->conditions[] = $column . $operator . $value . $boolean;
+//        $text=$this->conditions[$column][2] . " " . key($this->conditions) . " "
+//            .  implode(' ', array_slice($this->conditions[$column], 0, 2));
 
         return $this;
     }
@@ -55,7 +64,7 @@ class QueryBuilder implements QueryBuilderInterface
 
         $this->query = 'SELECT ' . implode(', ', $this->fields)
             . ' FROM ' . $this->table
-            . (empty($this->conditions) ? "" : ' WHERE ' . implode(' ', $this->conditions))
+            . var_dump($this->conditions)
             . ($this->firstflag==false ? "" : ' LIMIT  1');
         return $this->query;
     }

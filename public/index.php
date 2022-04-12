@@ -14,8 +14,9 @@ $query = new \Database\QueryBuilder("dima", connection: $connection->getConnecti
 
 $result = $query
     ->select()
-//    ->where('column_first',value: ['name',10])
-//    ->where('column_second', 'ilike', '%test%')
+    ->where('column_first',10)
+    ->where('column_second', 'ilike', '%test%')
+    ->where('column_third', 'in', [10,"dima"])
     ->first();
 
 var_dump($result);
