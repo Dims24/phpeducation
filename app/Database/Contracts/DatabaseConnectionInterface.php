@@ -73,7 +73,7 @@ interface DatabaseConnectionInterface
 
     public function setConnection(PDO $connection): void;
 
-    public function initConnection(): void;
+    public function initConnection();
 
     public function getDSN(): string;
 }

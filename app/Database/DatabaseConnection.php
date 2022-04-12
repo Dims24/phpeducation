@@ -148,4 +148,11 @@ class DatabaseConnection implements DatabaseConnectionInterface
     {
         return "pgsql:host={$this->getHost()};port={$this->getPort()};dbname={$this->getDatabase()};";
     }
+
+    public function getConn()
+    {
+        if ($this->connection instanceof PDO) {
+            return $this->connection;
+        }
+    }
 }

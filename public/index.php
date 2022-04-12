@@ -7,12 +7,12 @@ $connection = new \Database\DatabaseConnection(
     password: "Lbvf1998"
 );
 
-$query = new \Database\QueryBuilder("dima", connect: $connection);
+$query = new \Database\QueryBuilder("dima", connection: $connection->getConn());
 
 $result = $query
-    ->select(['column_first', 'column_second'])
-    ->where('column_first', '=', 10)
-    ->where('column_second', 'ilike', '%test%')
-    ->get();
+    ->select()
+    ->where('column_first',value: ['name',10])
+//    ->where('column_second', 'ilike', '%test%')
+    ->toSql();
 
 var_dump($result);

@@ -10,83 +10,60 @@ class QueryBuilder implements QueryBuilderInterface
 {
 
     private $fields = [];
-    private $whereflag = false;
-    private string $conditions;
-    private int $count;
-    private $first = false;
+    private $conditions = [];
     private string $query;
 
     public function __construct(
         protected string $table,
-        protected DatabaseConnectionInterface $connect
+        protected $connection
     ) {}
 
-
-    public function select(string ...$select): self
+    public function select(string|array $select=["*"]): self
     {
-        if ($select == null) {
-            $this->fields = ["*"];
-            return $this;
-        } else {
+        if(is_array($select)){
             $this->fields = $select;
-            return $this;
         }
-
-    }
-
-    public function where(string $colum, string $meaning, mixed $conditions=null, string $type = ''): self
-    {
-        if (is_null($conditions))
-        {
-            $conditions = '=';
-        }
-        if (empty($this->conditions)) {
-            if ((bool)$type) {
-                $this->conditions = "{$colum} {$conditions} {$meaning} {$type} ";
-            } else {
-                $this->conditions = "{$colum} {$conditions} {$meaning}";
-            }
-        } else {
-            if ((bool)$type) {
-                $this->conditions .= "{$colum} {$conditions} {$meaning} {$type} ";
-            } else {
-                $this->conditions .= "{$colum} {$conditions} {$meaning}";
-            }
+        else{
+            $this->fields[] = $select;
         }
         return $this;
     }
 
+    public function where(string $column, mixed $operator = null, mixed $value = null, string $boolean = 'AND'): self
+    {
+        if (is_null($operator))
+        {
+            $operator = '=';
+        }
+
+        $this->conditions[] = $column . $operator . $value . $boolean;
+
+        return $this;
+    }
+
+    public function count(): int
+    {
+        $this->toSql();
+        echo $this->query;
+        $sth = $this->connection->prepare($this->query);
+        return $sth->rowCount();
+    }
 
     public function toSql(): string
     {
-
         $this->query = 'SELECT ' . implode(', ', $this->fields)
             . ' FROM ' . $this->table
-            . (empty($this->conditions) ? "" : ' WHERE ' . $this->conditions)
-            . ($this->first == false ? '' : ' LIMIT 1')
-            . (empty($this->count) ? '' : ' LIMIT ' . $this->count);
+            . (empty($this->conditions) ? "" : ' WHERE ' . implode(' ', $this->conditions));
         return $this->query;
     }
 
     public function first(): mixed
     {
-        $this->first = true;
         $this->toSql();
+        $this->query .=  ' LIMIT 1';
         echo $this->query;
-        $c = $this->connect;
+        $c=$this->connection;
         $sth = $c->prepare($this->query);
-        $sth->execute();
-        return $sth->fetchAll();
-    }
-
-    public function count(int $count): mixed
-    {
-        $this->count = $count;
-        $this->toSql();
-        echo $this->query;
-        $c = $this->connect;
-        $sth = $c->prepare($this->query);
-        $sth->execute();
         return $sth->fetchAll();
     }
 
@@ -94,9 +71,7 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $this->toSql();
         echo $this->query;
-        $c = $this->connect;
-        $sth = $c->prepare($this->query);
-        $sth->execute();
+        $sth = $this->connection->prepare($this->query);
         return $sth->fetchAll();
     }
 }
