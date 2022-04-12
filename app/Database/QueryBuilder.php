@@ -53,17 +53,17 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $this->query = 'SELECT ' . implode(', ', $this->fields)
             . ' FROM ' . $this->table
-            . (empty($this->conditions) ? "" : ' WHERE ' . implode(' ', $this->conditions));
+            . (empty($this->conditions) ? "" : ' WHERE ' . implode(' ', $this->conditions))
+            . (function_exists('first') ? "": ' LIMIT 1');
         return $this->query;
     }
 
     public function first(): mixed
     {
         $this->toSql();
-        $this->query .=  ' LIMIT 1';
         echo $this->query;
-        $c=$this->connection;
-        $sth = $c->prepare($this->query);
+        $sth = $this->connection->prepare($this->query);
+        $sth->execute();
         return $sth->fetchAll();
     }
 
@@ -71,7 +71,9 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $this->toSql();
         echo $this->query;
-        $sth = $this->connection->prepare($this->query);
+        $sth = $this->connection
+            ->prepare($this->query);
+        $sth->execute();
         return $sth->fetchAll();
     }
 }

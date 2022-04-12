@@ -2,17 +2,20 @@
 require_once '..\bootstrap\app.php';
 
 $connection = new \Database\DatabaseConnection(
-    database: "dataphp",
+    database: "phptest",
     username: "dimaphp",
-    password: "Lbvf1998"
+    password: "1234"
 );
+//database: "dataphp",
+//    username: "dimaphp",
+//    password: "Lbvf1998"
 
-$query = new \Database\QueryBuilder("dima", connection: $connection->getConn());
+$query = new \Database\QueryBuilder("dima", connection: $connection->getConnection());
 
 $result = $query
     ->select()
-    ->where('column_first',value: ['name',10])
+//    ->where('column_first',value: ['name',10])
 //    ->where('column_second', 'ilike', '%test%')
-    ->toSql();
+    ->first();
 
 var_dump($result);
