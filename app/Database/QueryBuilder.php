@@ -16,15 +16,16 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function __construct(
         protected string $table,
-        protected $connection
-    ) {}
-
-    public function select(string|array $select=["*"]): self
+        protected        $connection
+    )
     {
-        if(is_array($select)){
+    }
+
+    public function select(string|array $select = ["*"]): self
+    {
+        if (is_array($select)) {
             $this->fields = $select;
-        }
-        else{
+        } else {
             $this->fields[] = $select;
         }
         return $this;
@@ -32,19 +33,22 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function where(string $column, mixed $operator = null, mixed $value = null, string $boolean = 'AND'): self
     {
-        if (is_null($value))
-        {
+        if (!$this->conditions) {
+            $boolean = 'WHERE';
+        }
+        if (is_null($value)) {
             $value = $operator;
             $operator = '=';
         }
-        if(empty($this->conditions)){
-            $this->conditions = array($column => [$boolean,$operator,$value]);
+        if (empty($this->conditions)) {
+            $this->conditions = array($column => [$boolean, $operator, $value]);
+        } else {
+            $this->conditions[$column] = [$boolean, $operator, $value];
         }
-        else
-        {
-            $this->conditions[$column] = [$boolean,$value,$operator];
+        if (is_array($value)) {
+            $value = "(" . implode(',', $this->conditions[$column][2]) . ")";
+            $this->conditions[$column] = [$boolean, $operator, $value];
         }
-
 //        $text=$this->conditions[$column][2] . " " . key($this->conditions) . " "
 //            .  implode(' ', array_slice($this->conditions[$column], 0, 2));
 
@@ -65,13 +69,21 @@ class QueryBuilder implements QueryBuilderInterface
         $this->query = 'SELECT ' . implode(', ', $this->fields)
             . ' FROM ' . $this->table
             . var_dump($this->conditions)
-            . ($this->firstflag==false ? "" : ' LIMIT  1');
+            . ($this->firstflag == false ? "" : ' LIMIT  1');
         return $this->query;
     }
 
+    private function buildWhere()
+    {
+        foreach ($this->conditions as $key => $val) {
+            echo $key;
+        }
+    }
+
+
     public function first(): mixed
     {
-        $this->firstflag=true;
+        $this->firstflag = true;
         $this->toSql();
         echo $this->query;
         $sth = $this->connection->prepare($this->query);
