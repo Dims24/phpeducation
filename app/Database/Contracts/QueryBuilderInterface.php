@@ -6,7 +6,7 @@ namespace Database\Contracts;
 interface QueryBuilderInterface
 {
     public function select(string|array $select): self;
-    public function where(string $column, mixed $operator = null, mixed $value = null, string $boolean = 'and'): self;
+    public function where(string|array $column, mixed $operator = null, mixed $value = null, string $boolean = 'and'): self;
 
     public function toSql(): string;
     public function count(): int;
