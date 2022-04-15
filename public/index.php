@@ -14,9 +14,9 @@ $query = new \Database\QueryBuilder("dima", connection: $connection->getConnecti
 
 $result = $query
     ->select()
-    ->where('column_first',"!=", null)
-    ->where('column_second', 'ilike', '%test%')
-    ->where('column_third', 'in', [10,"dima"],"or")
-    ->where(["colum"=>"colum"])
-    ->toSql();
+    ->where('column_first')
+//    ->where('column_second', 'ilike', '%test%')
+//    ->where('column_third', 'in', [10,"dima"],"or")
+//    ->where(["colum"=>"colum"])
+    ->get();
 var_dump($result);
