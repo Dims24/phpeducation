@@ -10,13 +10,14 @@ $connection = new \Database\DatabaseConnection(
 //    username: "dimaphp",
 //    password: "Lbvf1998"
 
-$query = new \Database\QueryBuilder("dima", connection: $connection->getConnection());
+$query = new \Database\QueryBuilder("articles", connection: $connection->getConnection());
 
 $result = $query
     ->select()
-    ->where('column_first')
+    ->where('user_id', "=",44)
+//    ->where('column_first',null)
 //    ->where('column_second', 'ilike', '%test%')
 //    ->where('column_third', 'in', [10,"dima"],"or")
 //    ->where(["colum"=>"colum"])
-    ->get();
+    ->count();
 var_dump($result);
