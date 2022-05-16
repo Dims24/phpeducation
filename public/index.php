@@ -14,10 +14,12 @@ $query = new \Database\QueryBuilder("articles", connection: $connection->getConn
 
 $result = $query
     ->select()
-    ->where('user_id', "=",44)
-//    ->where('column_first',null)
-//    ->where('column_second', 'ilike', '%test%')
-//    ->where('column_third', 'in', [10,"dima"],"or")
-//    ->where(["colum"=>"colum"])
+//    ->where('user_id', "=",44)
+    ->where('name',"!=",null)
+//    ->where('name', 'ilike', '%PLC%')
+//    ->where('user_id', 'in', [58],"or")
+//    ->where(["colum"=>"user_id",
+//        "operator"=>"=",
+//        "value"=>58])
     ->count();
 var_dump($result);

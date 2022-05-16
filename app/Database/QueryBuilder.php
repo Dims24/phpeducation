@@ -35,18 +35,25 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function where(string|array $column, mixed $operator = null, mixed $value = null, string $boolean = 'AND'): self
     {
-//        var_dump(func_get_args());
+//        var_dump(array_key_exists("2", func_get_args()));
 //        var_dump(boolval(!array_key_exists("1", func_get_args())));
 //        var_dump(boolval(!array_key_exists("2", func_get_args())));
 //        var_dump(is_array(func_get_args()[0]));
+        /*
+        IF COLUMN IS ARRAY
+        */
         if (is_array(func_get_args()[0])) {
             foreach ($column as $val) {
                 $this->conditionsarray[] = $val;
             }
+            var_dump($this->conditionsarray);
             $column = $this->conditionsarray[0];
-            $operator = (empty($this->conditionsarray[1]) ? null : $this->conditionsarray[1]);
-            $value = (empty($this->conditionsarray[2]) ? null : $this->conditionsarray[2]);
-            $this->where($column, $operator, $value);
+//            $operator = (empty($this->conditionsarray[1]) ? null : $this->conditionsarray[1]);
+            $operator = $this->conditionsarray[1];
+            $value = $this->conditionsarray[2];
+            $boolean = (empty($this->conditionsarray[4]) ? 'AND' : $this->conditionsarray[3]);
+            echo $column, $operator, $value, $boolean;
+            $this->where($column, $operator, $value, $boolean);
             return $this;
         }
 
@@ -56,20 +63,36 @@ class QueryBuilder implements QueryBuilderInterface
             if (!$this->conditions) {
                 $boolean = ' WHERE';
             }
-            if (func_get_args()[1] == "!=" and  func_get_args()[2] == null and (!is_array($column))) {
+            /*
+            IS NULL
+            */
+            if ((func_get_args()[1] == null or func_get_args()[1] == 'null') and (!is_array($column))) {
+
+                $operator = "IS";
+                $value = "NULL";
+//                $this->execute[] = $column;
+                $this->conditions[] = array($boolean, $column, $operator, $value);
+                return $this;
+            }
+            /*
+            IS NOT NULL
+            */
+            if (func_get_args()[1] == "!=" and (func_get_args()[2] == null or func_get_args()[2] == 'null') and (!is_array($column))) {
                 $operator = "IS NOT";
                 $value = "NULL";
 //                $this->execute[] = $column;
                 $this->conditions[] = array($boolean, $column, $operator, $value);
                 return $this;
             }
-          /*
-            IN
-          */
+            /*
+            VALUE IS ARRAY
+            */
             if (is_array($value)) {
+                foreach ($value as $val) {
+                    $this->execute[] = $val;
+                }
                 $value = str_repeat('?,', count($value) - 1) . '?';
 //                $this->execute[] = $column;
-                $this->execute[] = $value;
                 $this->conditions[] = array($boolean, $column, $operator, "($value)");
                 return $this;
             }
@@ -78,16 +101,24 @@ class QueryBuilder implements QueryBuilderInterface
             $this->conditions[] = array($boolean, $column, $operator, "?");
             return $this;
         } else if (array_key_exists("1", func_get_args()) and !array_key_exists("2", func_get_args())) {
+            echo 1;
             if (!$this->conditions) {
                 $boolean = ' WHERE';
             }
-            if (func_get_args()[1] == null and (!is_array($column))) {
+            /*
+            IS NULL
+            */
+            if ((func_get_args()[1] == null or func_get_args()[1] == 'null') and (!is_array($column))) {
+
                 $operator = "IS";
                 $value = "NULL";
 //                $this->execute[] = $column;
                 $this->conditions[] = array($boolean, $column, $operator, $value);
                 return $this;
             }
+            /*
+            IF VALUE EMPTY (null)
+            */
             if (array_key_exists("1", func_get_args()) and is_null($value) and !is_null($operator)) {
                 $value = $operator;
                 $operator = '=';
@@ -100,7 +131,7 @@ class QueryBuilder implements QueryBuilderInterface
             $this->execute[] = $value;
             $this->conditions[] = array($boolean, $column, $operator, "?");
             return $this;
-        }else{
+        } else {
             return $this;
         }
     }
