@@ -18,10 +18,9 @@ $result = $query
 //    ->where('name', "!=", null)
 //    ->where('name', 'ilike', '%PLC%')
 //    ->where('user_id', 'in', [58],"or")
-    ->where(["user_id"=>72,
-        "id"=>51])
+    ->where(["user_id"=>72])
 //    ->orderby("user_id","ASC")
 //    ->limit(5)
 //    ->skip(2)
-    ->get();
+    ->first();
 var_dump($result);

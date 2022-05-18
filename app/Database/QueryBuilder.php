@@ -196,7 +196,7 @@ class QueryBuilder implements QueryBuilderInterface
         echo $this->query;
         $sth = $this->connection->prepare($this->query);
         $sth->execute($this->execute);
-        return $sth->fetchAll();
+        return $sth->fetch();
     }
 
     public function get(): mixed
