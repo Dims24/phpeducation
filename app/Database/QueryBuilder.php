@@ -16,6 +16,7 @@ class QueryBuilder implements QueryBuilderInterface
     private string $sortorder;
     private string $query;
     private int $limits;
+    private int $offs;
 
     public function __construct(
         protected string $table,
@@ -40,16 +41,9 @@ class QueryBuilder implements QueryBuilderInterface
         IF COLUMN IS ARRAY
         */
         if (is_array(func_get_args()[0])) {
-            foreach ($column as $val) {
-                $this->conditionsarray[] = $val;
+            foreach ($column as $key=>$val) {
+                $this->where($key,$val);;
             }
-            var_dump($this->conditionsarray);
-            $column = $this->conditionsarray[0];
-            $operator = $this->conditionsarray[1];
-            $value = $this->conditionsarray[2];
-            $boolean = (empty($this->conditionsarray[4]) ? 'AND' : $this->conditionsarray[3]);
-            echo $column, $operator, $value, $boolean;
-            $this->where($column, $operator, $value, $boolean);
             return $this;
         }
 
@@ -66,7 +60,6 @@ class QueryBuilder implements QueryBuilderInterface
 
                 $operator = "IS";
                 $value = "NULL";
-
                 $this->conditions[] = array($boolean, $column, $operator, $value);
                 return $this;
             }
@@ -76,7 +69,6 @@ class QueryBuilder implements QueryBuilderInterface
             if (func_get_args()[1] == "!=" and (func_get_args()[2] == null or func_get_args()[2] == 'null') and (!is_array($column))) {
                 $operator = "IS NOT";
                 $value = "NULL";
-
                 $this->conditions[] = array($boolean, $column, $operator, $value);
                 return $this;
             }
@@ -88,15 +80,15 @@ class QueryBuilder implements QueryBuilderInterface
                     $this->execute[] = $val;
                 }
                 $value = str_repeat('?,', count($value) - 1) . '?';
-
                 $this->conditions[] = array($boolean, $column, $operator, "($value)");
                 return $this;
             }
             $this->execute[] = $value;
             $this->conditions[] = array($boolean, $column, $operator, "?");
             return $this;
-        } else if (array_key_exists("1", func_get_args()) and !array_key_exists("2", func_get_args())) {
-            echo 1;
+        }
+        else if (array_key_exists("1", func_get_args()) and !array_key_exists("2", func_get_args()))
+        {
             if (!$this->conditions) {
                 $boolean = ' WHERE';
             }
@@ -107,7 +99,6 @@ class QueryBuilder implements QueryBuilderInterface
 
                 $operator = "IS";
                 $value = "NULL";
-
                 $this->conditions[] = array($boolean, $column, $operator, $value);
                 return $this;
             }
@@ -117,7 +108,6 @@ class QueryBuilder implements QueryBuilderInterface
             if (array_key_exists("1", func_get_args()) and is_null($value) and !is_null($operator)) {
                 $value = $operator;
                 $operator = '=';
-
                 $this->execute[] = $value;
                 $this->conditions[] = array($boolean, $column, $operator, "?");
                 return $this;
@@ -146,7 +136,6 @@ class QueryBuilder implements QueryBuilderInterface
                 $this->sortorder = $sort;
             }
         }
-
         return $this;
     }
 
@@ -154,6 +143,13 @@ class QueryBuilder implements QueryBuilderInterface
     public function limit(int $limit): self
     {
         $this->limits = $limit;
+        return $this;
+    }
+
+
+    public function skip(int $offset): self
+    {
+        $this->offs = $offset;
         return $this;
     }
 
@@ -172,9 +168,8 @@ class QueryBuilder implements QueryBuilderInterface
             . ' FROM ' . $this->table
             . $this->buildWhere()
             . (empty($this->sortorder) ? "" : ' ORDER BY' . " " . $this->sortorder)
-            . (isset($this->limits) ? ' LIMIT ' . $this->limits : "");
-
-        var_dump(empty($this->sortorder));
+            . (isset($this->limits) ? ' LIMIT ' . $this->limits : "")
+            . (empty($this->offs) ? "" : ' OFFSET ' . $this->offs);
         return $this->query;
     }
 
