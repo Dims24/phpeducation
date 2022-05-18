@@ -15,11 +15,13 @@ $query = new \Database\QueryBuilder("articles", connection: $connection->getConn
 $result = $query
     ->select()
 //    ->where('user_id', "=",44)
-    ->where('name',"!=",null)
+    ->where('name', "!=", null)
 //    ->where('name', 'ilike', '%PLC%')
 //    ->where('user_id', 'in', [58],"or")
 //    ->where(["colum"=>"user_id",
 //        "operator"=>"=",
 //        "value"=>58])
-    ->count();
+    ->orderby(["name", "user_id"])
+//    ->limit(5)
+    ->get();
 var_dump($result);

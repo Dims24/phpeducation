@@ -13,8 +13,9 @@ class QueryBuilder implements QueryBuilderInterface
     private $conditions = [];
     private $conditionsarray = [];
     private $execute = [];
+    private string $sortorder;
     private string $query;
-    private bool $firstflag = false;
+    private int $limits;
 
     public function __construct(
         protected string $table,
@@ -35,10 +36,6 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function where(string|array $column, mixed $operator = null, mixed $value = null, string $boolean = 'AND'): self
     {
-//        var_dump(array_key_exists("2", func_get_args()));
-//        var_dump(boolval(!array_key_exists("1", func_get_args())));
-//        var_dump(boolval(!array_key_exists("2", func_get_args())));
-//        var_dump(is_array(func_get_args()[0]));
         /*
         IF COLUMN IS ARRAY
         */
@@ -48,7 +45,6 @@ class QueryBuilder implements QueryBuilderInterface
             }
             var_dump($this->conditionsarray);
             $column = $this->conditionsarray[0];
-//            $operator = (empty($this->conditionsarray[1]) ? null : $this->conditionsarray[1]);
             $operator = $this->conditionsarray[1];
             $value = $this->conditionsarray[2];
             $boolean = (empty($this->conditionsarray[4]) ? 'AND' : $this->conditionsarray[3]);
@@ -70,7 +66,7 @@ class QueryBuilder implements QueryBuilderInterface
 
                 $operator = "IS";
                 $value = "NULL";
-//                $this->execute[] = $column;
+
                 $this->conditions[] = array($boolean, $column, $operator, $value);
                 return $this;
             }
@@ -80,7 +76,7 @@ class QueryBuilder implements QueryBuilderInterface
             if (func_get_args()[1] == "!=" and (func_get_args()[2] == null or func_get_args()[2] == 'null') and (!is_array($column))) {
                 $operator = "IS NOT";
                 $value = "NULL";
-//                $this->execute[] = $column;
+
                 $this->conditions[] = array($boolean, $column, $operator, $value);
                 return $this;
             }
@@ -92,11 +88,10 @@ class QueryBuilder implements QueryBuilderInterface
                     $this->execute[] = $val;
                 }
                 $value = str_repeat('?,', count($value) - 1) . '?';
-//                $this->execute[] = $column;
+
                 $this->conditions[] = array($boolean, $column, $operator, "($value)");
                 return $this;
             }
-//            $this->execute[] = $column;
             $this->execute[] = $value;
             $this->conditions[] = array($boolean, $column, $operator, "?");
             return $this;
@@ -112,7 +107,7 @@ class QueryBuilder implements QueryBuilderInterface
 
                 $operator = "IS";
                 $value = "NULL";
-//                $this->execute[] = $column;
+
                 $this->conditions[] = array($boolean, $column, $operator, $value);
                 return $this;
             }
@@ -122,18 +117,44 @@ class QueryBuilder implements QueryBuilderInterface
             if (array_key_exists("1", func_get_args()) and is_null($value) and !is_null($operator)) {
                 $value = $operator;
                 $operator = '=';
-//                $this->execute[] = $column;
+
                 $this->execute[] = $value;
                 $this->conditions[] = array($boolean, $column, $operator, "?");
                 return $this;
             }
-//            $this->execute[] = $column;
+
             $this->execute[] = $value;
             $this->conditions[] = array($boolean, $column, $operator, "?");
             return $this;
         } else {
             return $this;
         }
+    }
+
+    /**
+     * @param string|array $sort параметр по которому сортируем
+     * @param string|null $order может быть "ASC" или "DESC"
+     */
+    public function orderby(string|array $sort, string $order = null): self
+    {
+        if (array_key_exists("1", func_get_args())) {
+            $this->sortorder = $sort . ' ' . strtoupper($order);
+        } else {
+            if (is_array($sort)) {
+                $this->sortorder = implode(', ', $sort);
+            } else {
+                $this->sortorder = $sort;
+            }
+        }
+
+        return $this;
+    }
+
+
+    public function limit(int $limit): self
+    {
+        $this->limits = $limit;
+        return $this;
     }
 
     public function count(): int
@@ -150,7 +171,10 @@ class QueryBuilder implements QueryBuilderInterface
         $this->query = 'SELECT ' . implode(', ', $this->fields)
             . ' FROM ' . $this->table
             . $this->buildWhere()
-            . ($this->firstflag == false ? "" : ' LIMIT  1');
+            . (empty($this->sortorder) ? "" : ' ORDER BY' . " " . $this->sortorder)
+            . (isset($this->limits) ? ' LIMIT ' . $this->limits : "");
+
+        var_dump(empty($this->sortorder));
         return $this->query;
     }
 
@@ -172,7 +196,7 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function first(): mixed
     {
-        $this->firstflag = true;
+        $this->limits = 1;
         $this->toSql();
         echo $this->query;
         $sth = $this->connection->prepare($this->query);
