@@ -4,7 +4,7 @@ namespace MyProject\Controllers;
 
 class MainController
 {
-    public function main()
+    public function main($test)
     {
         echo 'Главная страница';
     }
