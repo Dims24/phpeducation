@@ -4,6 +4,7 @@ namespace Router;
 
 use Application;
 use Helpers\FilesystemHelper;
+use MyProject\Models\Articles\Article;
 
 class Router
 {
@@ -56,7 +57,15 @@ class Router
         ];
     }
 
+    public function controllermethod($action): mixed
+    {
 
+        $class = stristr($action, '@', true);
+        $method = substr(stristr($action, '@'), 1);
+        $test2 = new $class();
+        $test2->$method();
+        return $test2;
+    }
 
 
 }

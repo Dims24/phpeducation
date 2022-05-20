@@ -33,9 +33,22 @@ class Application
 
     public function chek()
     {
-        $_SERVER["REQUEST_URI"];
+        $request = new \Router\Request();
+        $request= $request->getReguest();
         $chek = $this->router->getCompiledRoutes();
+
+        foreach ($chek as $method=>$array)
+        {
+            if ($request["method"]==$method)
+            {
+                foreach ($array as $item)
+                {
+                    if ($item["url"]==$request["url"])
+                    {
+                        return $this->router->controllermethod($item["action"]);
+                    }
+                }
+            }
+        }
     }
-
-
 }

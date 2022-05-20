@@ -4,29 +4,44 @@ use MyProject\Models\Users\User;
 class Article
 {
 
-    private $title;
-    private $text;
-    private $author;
 
-    public function __construct(string $title, string $text, User $author)
+    private mixed $title;
+//    private $text;
+//    private $author;
+
+    public function __construct()
     {
-        $this->title = $title;
-        $this->text = $text;
-        $this->author = $author;
+
+        $this->title = $this->selectTitle();
+//        $this->text = $text;
+//        $this->author = $author;
     }
 
-    public function getTitle(): string
+    public function getTitle(): mixed
     {
-        return $this->title;
+        $result = [
+          "title" => $this->title
+        ];
+        return $result;
     }
 
-    public function getText(): string
+    private function selectTitle()
     {
-        return $this->text;
+        $connection = new \Database\DatabaseConnection(
+            database: "phptest",
+            username: "dataphp",
+            password: "1234"
+        );
+        $query = new \Database\QueryBuilder("articles", connection: $connection->getConnection());
+        return $query->select("name")->first()[0];
     }
-
-    public function getAuthor(): User
-    {
-        return $this->author;
-    }
+//    public function getText(): string
+//    {
+//        return $this->text;
+//    }
+//
+//    public function getAuthor(): User
+//    {
+//        return $this->author;
+//    }
 }

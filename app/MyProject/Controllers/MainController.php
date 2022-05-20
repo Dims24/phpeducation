@@ -2,14 +2,20 @@
 
 namespace MyProject\Controllers;
 
+use MyProject\Models\Articles\Article;
+
 class MainController
 {
-    public function main($test)
+    public function main()
     {
-        echo 'Главная страница';
+        echo 'Ебать приятно';
     }
-    public function sayHello(string $name)
+    public function sayHello() : mixed
     {
-        echo 'Привет, ' . $name;
+        $model = new Article();
+
+        var_dump($model->getTitle());
+        $result = json_encode($model->getTitle());
+        return $result;
     }
 }

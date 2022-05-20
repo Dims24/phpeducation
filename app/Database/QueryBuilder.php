@@ -177,7 +177,7 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $this->limits = 1;
         $this->toSql();
-        echo $this->query;
+//        echo $this->query;
         $sth = $this->connection->prepare($this->query);
         $sth->execute($this->execute);
         return $sth->fetch();
