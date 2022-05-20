@@ -1,8 +1,8 @@
 <?php
 
-namespace Router;
+namespace Foundation\HTTP;
 
-enum RouterHTTPMethodsEnum: string
+enum HTTPMethodsEnum: string
 {
     case Get = 'GET';
     case Post = 'POST';

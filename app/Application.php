@@ -1,5 +1,7 @@
 <?php
 
+use Foundation\HTTP\Request;
+
 class Application
 {
     protected \Router\Router $router;
@@ -18,37 +20,24 @@ class Application
     public function run()
     {
         $this->initRouter();
-//        $class = '\Application';
-//        $method = 'main';
-//        $test2 = new $class();
-//        $test2->$method();
-        $this->chek();
+        $response = $this->router->execute(
+            $this->captureRequest()
+        );
 
+        return $response;
     }
 
-    public function initRouter()
+    public function captureRequest(): Request
+    {
+        $request = new Request();
+
+        $request->initRequestFromGlobals();
+
+        return $request;
+    }
+
+    public function initRouter(): void
     {
         $this->router->compileRoutes();
-    }
-
-    public function chek()
-    {
-        $request = new \Router\Request();
-        $request= $request->getReguest();
-        $chek = $this->router->getCompiledRoutes();
-
-        foreach ($chek as $method=>$array)
-        {
-            if ($request["method"]==$method)
-            {
-                foreach ($array as $item)
-                {
-                    if ($item["url"]==$request["url"])
-                    {
-                        return $this->router->controllermethod($item["action"]);
-                    }
-                }
-            }
-        }
     }
 }

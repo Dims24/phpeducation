@@ -2,14 +2,16 @@
 
 namespace MyProject\Controllers;
 
+use Foundation\HTTP\Request;
 use MyProject\Models\Articles\Article;
 
 class MainController
 {
-    public function main()
+    public function main(Request $sdjasndjkasbkjd)
     {
-        echo 'Ебать приятно';
+        dd($sdjasndjkasbkjd->get('test'));
     }
+
     public function sayHello() : mixed
     {
         $model = new Article();
