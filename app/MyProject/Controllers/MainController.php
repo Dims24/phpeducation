@@ -9,15 +9,30 @@ class MainController
 {
     public function main(Request $sdjasndjkasbkjd)
     {
-        dd($sdjasndjkasbkjd->get('test'));
+//        $models = Article::all();
+        $models = Article::query()->select()->where('name', 'Braun LLC')->;
+        dd($models);
+
+
+
     }
 
     public function sayHello() : mixed
     {
         $model = new Article();
+//        $model->name = 'test';
+//        $model->save();
 
-        var_dump($model->getTitle());
-        $result = json_encode($model->getTitle());
-        return $result;
+        dd($model->getAll());
+
     }
+
+    public function namedRoute($test, $key)
+    {
+        $model = new Article();
+
+
+        dd($model->getRowByNameAndUserId($test, $key));
+    }
+
 }

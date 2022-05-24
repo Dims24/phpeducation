@@ -24,6 +24,7 @@ class FilesystemHelper
 
     public static function getRoot(): string
     {
+        #Возвращает 'C:\Users\Admin\PhpstormProjects\phpeducation\app\Helpers'
         $current_path = __DIR__;
 
         $exploded_current_dir = explode(DIRECTORY_SEPARATOR, $current_path);

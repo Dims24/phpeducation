@@ -12,14 +12,17 @@ class Application
     {
         if (!is_null($router)) {
             $this->router = $router;
+
         } else {
-            $this->router = new \Router\Router();
+            $this->router = new \Router\Router(); #$this->router = [3]
         }
     }
 
+    #Функция запуска приложения
     public function run()
     {
         $this->initRouter();
+
         $response = $this->router->execute(
             $this->captureRequest()
         );

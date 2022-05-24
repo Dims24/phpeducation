@@ -6,10 +6,12 @@ class Request
 {
     protected HTTPMethodsEnum $method;
     protected string $uri;
+    protected string $path;
     protected string $host;
     protected array $query;
     protected array $body;
     protected array $files;
+
 
     public function __construct()
     {}
@@ -18,6 +20,7 @@ class Request
     {
         $this->method = HTTPMethodsEnum::from($_SERVER['REQUEST_METHOD']);
         $this->uri = $_SERVER["REQUEST_URI"];
+        $this->path = explode("?", $this->uri)[0];
         $this->host = $_SERVER["HTTP_HOST"];
         $this->query = $_GET;
         $this->files = $_FILES;
@@ -63,6 +66,14 @@ class Request
     /**
      * @return string
      */
+    public function getPath(): string
+    {
+        return $this->path;
+    }
+
+    /**
+     * @return string
+     */
     public function getHost(): string
     {
         return $this->host;
@@ -82,6 +93,62 @@ class Request
     public function getBody(): array
     {
         return $this->body;
+    }
+
+    /**
+     * @param HTTPMethodsEnum $method
+     */
+    public function setMethod(HTTPMethodsEnum $method): void
+    {
+        $this->method = $method;
+    }
+
+    /**
+     * @param string $uri
+     */
+    public function setUri(string $uri): void
+    {
+        $this->uri = $uri;
+    }
+
+    /**
+     * @param string $path
+     */
+    public function setPath(string $path): void
+    {
+        $this->path = $path;
+    }
+
+    /**
+     * @param string $host
+     */
+    public function setHost(string $host): void
+    {
+        $this->host = $host;
+    }
+
+    /**
+     * @param array $query
+     */
+    public function setQuery(array $query): void
+    {
+        $this->query = $query;
+    }
+
+    /**
+     * @param array $body
+     */
+    public function setBody(array $body): void
+    {
+        $this->body = $body;
+    }
+
+    /**
+     * @param array $files
+     */
+    public function setFiles(array $files): void
+    {
+        $this->files = $files;
     }
 
     public function get(string $name): mixed
