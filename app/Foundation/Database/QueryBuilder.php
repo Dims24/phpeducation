@@ -1,26 +1,26 @@
 <?php
 
-namespace Database;
+namespace App\Foundation\Database;
 
-use Database\Contracts\DatabaseConnectionInterface;
-use Database\Contracts\QueryBuilderInterface;
-use Database\DatabaseConnection;
+use App\Common\Hydrate\CanHydrateInterface;
+use App\Foundation\Database\Contracts\QueryBuilderInterface;
+use App\Foundation\HTTP\Exceptions\NotFoundException;
 
 class QueryBuilder implements QueryBuilderInterface
 {
 
-    private $fields = [];
-    private $conditions = [];
-    private $conditionsarray = [];
-    private $execute = [];
-    private string $sortorder;
+    private array $fields = [];
+    private array $conditions = [];
+    private array $execute = [];
+    private string $sort_order;
     private string $query;
     private int $limits;
     private int $offs;
 
     public function __construct(
         protected string $table,
-        protected        $connection
+        protected        $connection,
+        protected ?CanHydrateInterface $hydrate_model = null,
     )
     {
     }
@@ -41,8 +41,8 @@ class QueryBuilder implements QueryBuilderInterface
         IF COLUMN IS ARRAY
         */
         if (is_array(func_get_args()[0])) {
-            foreach ($column as $key=>$val) {
-                $this->where($key,$val);;
+            foreach ($column as $key => $val) {
+                $this->where($key, $val);;
             }
             return $this;
         }
@@ -55,8 +55,7 @@ class QueryBuilder implements QueryBuilderInterface
             /*
             IS NOT NULL
             */
-            if (func_get_args()[1] == "!=" and (func_get_args()[2] == null or func_get_args()[2] == 'null') and (!is_array($column)))
-            {
+            if (func_get_args()[1] == "!=" and (func_get_args()[2] == null or func_get_args()[2] == 'null') and (!is_array($column))) {
                 $operator = "IS NOT";
                 $value = "NULL";
                 $this->conditions[] = array($boolean, $column, $operator, $value);
@@ -65,10 +64,8 @@ class QueryBuilder implements QueryBuilderInterface
             /*
             VALUE IS ARRAY
             */
-            if (is_array($value))
-            {
-                foreach ($value as $val)
-                {
+            if (is_array($value)) {
+                foreach ($value as $val) {
                     $this->execute[] = $val;
                 }
                 $value = str_repeat('?,', count($value) - 1) . '?';
@@ -78,14 +75,11 @@ class QueryBuilder implements QueryBuilderInterface
             $this->execute[] = $value;
             $this->conditions[] = array($boolean, $column, $operator, "?");
             return $this;
-        }
-        else if (array_key_exists("1", func_get_args()) and !array_key_exists("2", func_get_args()))
-        {
+        } else if (array_key_exists("1", func_get_args()) and !array_key_exists("2", func_get_args())) {
             /*
             IS NULL
             */
-            if ((func_get_args()[1] == null or func_get_args()[1] == 'null') and (!is_array($column)))
-            {
+            if ((func_get_args()[1] == null or func_get_args()[1] == 'null') and (!is_array($column))) {
                 $operator = "IS";
                 $value = "NULL";
                 $this->conditions[] = array($boolean, $column, $operator, $value);
@@ -94,8 +88,7 @@ class QueryBuilder implements QueryBuilderInterface
             /*
             IF VALUE EMPTY (null)
             */
-            if (array_key_exists("1", func_get_args()) and is_null($value) and !is_null($operator))
-            {
+            if (array_key_exists("1", func_get_args()) and is_null($value) and !is_null($operator)) {
                 $value = $operator;
                 $operator = '=';
                 $this->execute[] = $value;
@@ -117,12 +110,12 @@ class QueryBuilder implements QueryBuilderInterface
     public function orderby(string|array $sort, string $order = null): self
     {
         if (array_key_exists("1", func_get_args())) {
-            $this->sortorder = $sort . ' ' . strtoupper($order);
+            $this->sort_order = $sort . ' ' . strtoupper($order);
         } else {
             if (is_array($sort)) {
-                $this->sortorder = implode(', ', $sort);
+                $this->sort_order = implode(', ', $sort);
             } else {
-                $this->sortorder = $sort;
+                $this->sort_order = $sort;
             }
         }
         return $this;
@@ -154,7 +147,7 @@ class QueryBuilder implements QueryBuilderInterface
         $this->query = 'SELECT ' . implode(', ', $this->fields)
             . ' FROM ' . $this->table
             . $this->buildWhere()
-            . (empty($this->sortorder) ? "" : ' ORDER BY' . " " . $this->sortorder)
+            . (empty($this->sort_order) ? "" : ' ORDER BY' . " " . $this->sort_order)
             . (isset($this->limits) ? ' LIMIT ' . $this->limits : "")
             . (empty($this->offs) ? "" : ' OFFSET ' . $this->offs);
         return $this->query;
@@ -172,6 +165,16 @@ class QueryBuilder implements QueryBuilderInterface
         return $where;
     }
 
+    public function firstOrFail(): mixed
+    {
+        $result = $this->first();
+
+        if (is_null($result)) {
+            throw new NotFoundException();
+        }
+
+        return $result;
+    }
 
     public function first(): mixed
     {
@@ -180,7 +183,14 @@ class QueryBuilder implements QueryBuilderInterface
 //        echo $this->query;
         $sth = $this->connection->prepare($this->query);
         $sth->execute($this->execute);
-        return $sth->fetch();
+
+        $result = $sth->fetch();
+
+        if (!is_null($this->hydrate_model)) {
+            $result = $this->hydrate_model::hydrateFromSingle($result);
+        }
+
+        return $result;
     }
 
     public function get(): mixed
@@ -189,6 +199,13 @@ class QueryBuilder implements QueryBuilderInterface
         echo $this->query;
         $sth = $this->connection->prepare($this->query);
         $sth->execute($this->execute);
-        return $sth->fetchAll();
+
+        $result = $sth->fetchAll();
+
+        if (!is_null($this->hydrate_model)) {
+            $result = $this->hydrate_model::hydrateFromCollection($result);
+        }
+
+        return $result;
     }
 }

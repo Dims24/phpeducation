@@ -1,7 +1,7 @@
 <?php
-namespace MyProject\Models\Articles;
-use MyProject\Models\BaseModel;
-use MyProject\Models\Users\User;
+namespace App\Models;
+
+use App\Models\Common\BaseModel;
 
 class Article extends BaseModel
 {
@@ -18,17 +18,4 @@ class Article extends BaseModel
 
     /** @var string */
     public $description;
-
-
-
-
-//    private $data = [
-//        'id',
-//        'name',
-//        'description',
-//        'user_id',
-//    ];
-
-
-
 }

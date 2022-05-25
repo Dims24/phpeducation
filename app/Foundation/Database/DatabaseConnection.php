@@ -1,8 +1,8 @@
 <?php
 
-namespace Database;
+namespace App\Foundation\Database;
 
-use Database\Contracts\DatabaseConnectionInterface;
+use App\Foundation\Database\Contracts\DatabaseConnectionInterface;
 use PDO;
 
 class DatabaseConnection implements DatabaseConnectionInterface

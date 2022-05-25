@@ -1,10 +1,13 @@
 <?php
 
-namespace Router;
+namespace Foundation\Router;
 
-use Foundation\HTTP\HTTPMethodsEnum;
-use Foundation\HTTP\Request;
-use Helpers\FilesystemHelper;
+use App\Foundation\HTTP\Enums\HTTPMethodsEnum;
+use App\Foundation\HTTP\Exceptions\NotFoundException;
+use App\Foundation\HTTP\Request;
+use App\Foundation\HTTP\Response;
+use App\Helpers\FilesystemHelper;
+use ReflectionClass;
 
 class Router
 {
@@ -95,7 +98,11 @@ class Router
     }
 
 
-    public function execute(Request $request): mixed
+    /**
+     * @throws \ReflectionException
+     * @throws NotFoundException
+     */
+    public function execute(Request $request): Response
     {
         foreach (self::$compiled_routes[$request->getMethod()->value] as $action) {
             if (preg_match($action["url"]['pattern'], $request->getPath(), $router_results)) {
@@ -110,7 +117,7 @@ class Router
                 $method = $action['controller']['method'];
 
                 $executable_method_params = [];
-                $controller_reflection = new \ReflectionClass($class);
+                $controller_reflection = new ReflectionClass($class);
 
                 foreach ($controller_reflection->getMethod($method)->getParameters() as $method_param) {
                     if ($method_param->getType()) {
@@ -127,7 +134,7 @@ class Router
                 return $controller->$method(...$executable_method_params);
             }
         }
-        #TODO: Добавить возврат 404
-        return null;
+
+        throw new NotFoundException();
     }
 }

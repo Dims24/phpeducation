@@ -1,9 +1,7 @@
 <?php
 
-use Router\Router;
+use Foundation\Router\Router;
 
-Router::get('/home', '\MyProject\Controllers\MainController@main');
-Router::post('/home', '\MyProject\Controllers\MainController@main');
-Router::get('/home/hi', '\MyProject\Controllers\MainController@sayHello');
-Router::get('/home/{test}/test/{key}', '\MyProject\Controllers\MainController@namedRoute');
+Router::get('/home', 'App\Http\Controllers\MainController@main');
+Router::post('/home', 'App\Http\Controllers\MainController@main');
 //Router::post('/home/{test}/test/{key}', '\MyProject\Controllers\MainController@main');

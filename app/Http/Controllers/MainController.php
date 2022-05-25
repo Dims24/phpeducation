@@ -1,20 +1,21 @@
 <?php
 
-namespace MyProject\Controllers;
+namespace App\Http\Controllers;
 
-use Foundation\HTTP\Request;
-use MyProject\Models\Articles\Article;
+use App\Foundation\HTTP\Request;
+use App\Foundation\HTTP\Response;
+use App\Http\Common\BaseController;
+use App\Models\Article;
 
-class MainController
+class MainController extends BaseController
 {
     public function main(Request $sdjasndjkasbkjd)
     {
-//        $models = Article::all();
-        $models = Article::query()->select()->where('name', 'Braun LLC')->;
-        dd($models);
+        /** @var Article $article */
+        $article = Article::query()->select()->first();
+//        $response = new Response($article->toArray());
 
-
-
+        return $this->respond($article);
     }
 
     public function sayHello() : mixed

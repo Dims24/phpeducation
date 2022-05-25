@@ -1,10 +1,12 @@
 <?php
 
-namespace MyProject\Models;
+namespace App\Models\Common;
 
-use Database\QueryBuilder;
+use App\Common\Hydrate\CanHydrateInterface;
+use App\Foundation\Database\QueryBuilder;
+use App\Foundation\Database\DatabaseConnection;
 
-abstract class BaseModel
+abstract class BaseModel implements CanHydrateInterface
 {
     protected string $table = '';
     protected string $primary_key = 'id';
@@ -29,19 +31,22 @@ abstract class BaseModel
 
     public static function query(): QueryBuilder
     {
-        $connection = new \Database\DatabaseConnection(
+        $connection = new DatabaseConnection(
             database: "phptest",
             username: "dataphp",
             password: "1234"
         );
 
-
-        return new QueryBuilder(self::getSelfReflector()->getTable(), $connection->getConnection());
+        return new QueryBuilder(
+            self::getSelfReflector()->getTable(),
+            $connection->getConnection(),
+            self::getSelfReflector()
+        );
     }
 
-    protected static function hydrateFromCollection(array|bool|null $data): array
+    public static function hydrateFromCollection(mixed $data): array
     {
-        if ((is_bool($data) && !$data) || is_null($data) || !is_array($data) ||!count($data)) {
+        if (!is_array($data) ||!count($data)) {
             return [];
         }
 
@@ -57,9 +62,9 @@ abstract class BaseModel
         return $result;
     }
 
-    protected static function hydrateFromSingle(array|bool|null $data): ?BaseModel
+    public static function hydrateFromSingle(mixed $data): ?BaseModel
     {
-        if ((is_bool($data) && !$data) || is_null($data) || !is_array($data) ||!count($data)) {
+        if (!is_array($data) ||!count($data)) {
             return null;
         }
 
@@ -103,5 +108,19 @@ abstract class BaseModel
         return self::hydrateFromSingle($result);
     }
 
+    public function toArray(): array
+    {
+        $result = [];
 
+        $model_reflection = new \ReflectionClass(static::class);
+        foreach ($model_reflection->getProperties() as $model_property) {
+            if ($model_property->isPublic()) {
+                $result[$model_property->getName()] = $this->{$model_property->getName()};
+            }
+        }
+
+        return $result;
+    }
+
+//    public function recordHandler()
 }

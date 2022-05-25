@@ -1,6 +1,6 @@
 <?php
 
-namespace Foundation\HTTP;
+namespace App\Foundation\HTTP\Enums;
 
 enum HTTPMethodsEnum: string
 {

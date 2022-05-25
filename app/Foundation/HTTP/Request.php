@@ -1,6 +1,8 @@
 <?php
 
-namespace Foundation\HTTP;
+namespace App\Foundation\HTTP;
+
+use App\Foundation\HTTP\Enums\HTTPMethodsEnum;
 
 class Request
 {
