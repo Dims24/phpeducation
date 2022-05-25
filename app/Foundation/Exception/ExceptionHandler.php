@@ -8,10 +8,12 @@ use Throwable;
 
 class ExceptionHandler
 {
+
     #[NoReturn] public static function handleException(Throwable $exception): void
     {
+
         $exception_body = [
-            'time' => 'Y-m-d H:m:s',
+            'time' => date('Y-m-d H:i:s'),
             'message' => $exception->getMessage(),
             'code' => $exception->getCode(),
             'file' => $exception->getFile(),
@@ -35,7 +37,7 @@ class ExceptionHandler
     ): bool
     {
         $error_body = [
-            'time' => 'Y-m-d H:m:s',
+            'time' => date('Y-m-d H:i:s'),
             'level' => $message,
             'code' => $error_level,
             'file' => $file,

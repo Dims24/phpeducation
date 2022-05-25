@@ -1,6 +1,7 @@
 <?php
 
 require_once 'helpers.php';
+date_default_timezone_set("Europe/Moscow");
 
 spl_autoload_register(function (string $className) {
     $className = str_replace('App\\', '', $className);

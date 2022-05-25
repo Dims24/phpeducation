@@ -11,10 +11,7 @@ class MainController extends BaseController
 {
     public function main(Request $sdjasndjkasbkjd)
     {
-        /** @var Article $article */
-        $article = Article::query()->select()->first();
-//        $response = new Response($article->toArray());
-
+        $article = Article::query()->select()->where("name", 1213214)->firstOrFail();
         return $this->respond($article);
     }
 
