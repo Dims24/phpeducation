@@ -6,8 +6,10 @@ use App\Foundation\HTTP\Enums\HTTPMethodsEnum;
 use App\Foundation\HTTP\Exceptions\NotFoundException;
 use App\Foundation\HTTP\Request;
 use App\Foundation\HTTP\Response;
-use App\Helpers\FilesystemHelper;
+use App\Models\Common\BaseModel;
+use JetBrains\PhpStorm\ArrayShape;
 use ReflectionClass;
+use ReflectionException;
 
 class Router
 {
@@ -25,7 +27,7 @@ class Router
     public function compileRoutes(): void
     {
         #Возвращает 1
-        $route_scheme = require_once FilesystemHelper::getPath('routes/api.php');
+        $route_scheme = require_once path('routes/api.php');
     }
 
     public function getCompiledRoutes(): array
@@ -74,9 +76,9 @@ class Router
         ];
     }
 
+    #[ArrayShape(['pattern' => "string", 'variables' => "array"])]
     protected static function getRegexFromURL(string $url): array
     {
-
         $exploded_url = explode('/', $url);
         $result_url = [];
         $url_variables = [];
@@ -99,19 +101,21 @@ class Router
 
 
     /**
-     * @throws \ReflectionException
+     * @throws ReflectionException
      * @throws NotFoundException
      */
     public function execute(Request $request): Response
     {
         foreach (self::$compiled_routes[$request->getMethod()->value] as $action) {
             if (preg_match($action["url"]['pattern'], $request->getPath(), $router_results)) {
-                $result = [];
+                $route_variables = [];
                 for ($i = 1; $i <= count($action['url']['variables']); $i++) {
                     if (isset($router_results[$i])) {
-                        $result[$action['url']['variables'][$i - 1]] = $router_results[$i];
+                        $route_variables[$action['url']['variables'][$i - 1]] = $router_results[$i];
                     }
                 }
+
+                $request->setRouterVariables($route_variables);
 
                 $class = $action['controller']['class'];
                 $method = $action['controller']['method'];
@@ -120,16 +124,35 @@ class Router
                 $controller_reflection = new ReflectionClass($class);
 
                 foreach ($controller_reflection->getMethod($method)->getParameters() as $method_param) {
-                    if ($method_param->getType()) {
-                        if ($method_param->getType()->getName() == Request::class) {
+                    // Если не указывать тип данных в сигнатуре функции контроллера, вернётся null
+                    if (is_null($method_param->getType())) {
+                        if (array_key_exists($method_param->getName(), $route_variables)) {
+                            $executable_method_params[$method_param->getName()] = $route_variables[$method_param->getName()];
+                        }
+                    } else {
+                        $method_param_class = $method_param->getType()->getName();
+                        $scalar_types = [
+                            'bool',
+                            'int',
+                            'float',
+                            'string',
+                            'array',
+                            'object',
+                            'callable',
+                            'mixed',
+                            'resource'
+                        ];
+
+                        if (!in_array($method_param_class, $scalar_types) && is_a($method_param_class, BaseModel::class, true) && array_key_exists($method_param->getName(), $route_variables)) {
+                            $executable_method_params[$method_param->getName()] = $method_param_class::findOrFail($route_variables[$method_param->getName()]);
+                        } elseif ($method_param_class == Request::class) {
                             $executable_method_params[$method_param->getName()] = $request;
-                        } else {
-                            # TODO: Здесь могут быть переменные из маршрута
-                            $executable_method_params[$method_param->getName()] = null;
+                        } elseif (array_key_exists($method_param->getName(), $route_variables)) {
+                            $executable_method_params[$method_param->getName()] = $route_variables[$method_param->getName()];
                         }
                     }
                 }
-                $executable_method_params = array_merge($executable_method_params, $result);
+
                 $controller = new $class();
                 return $controller->$method(...$executable_method_params);
             }

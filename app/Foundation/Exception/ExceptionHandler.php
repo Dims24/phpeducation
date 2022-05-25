@@ -21,7 +21,7 @@ class ExceptionHandler
             'trace' => $exception->getTrace(),
         ];
 
-        $response = new Response($exception_body, $exception->getCode());
+        $response = new Response($exception_body, (int) $exception->getCode());
 
         $response->send();
 

@@ -13,10 +13,7 @@ class Request
     protected array $query;
     protected array $body;
     protected array $files;
-
-
-    public function __construct()
-    {}
+    protected array $router_variables = [];
 
     public function initRequestFromGlobals(): void
     {
@@ -39,6 +36,22 @@ class Request
         } else {
             $this->body = $_POST;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getRouterVariables(): array
+    {
+        return $this->router_variables;
+    }
+
+    /**
+     * @param  array  $router_variables
+     */
+    public function setRouterVariables(array $router_variables): void
+    {
+        $this->router_variables = $router_variables;
     }
 
     /**

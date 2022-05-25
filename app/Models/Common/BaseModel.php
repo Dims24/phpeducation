@@ -5,6 +5,7 @@ namespace App\Models\Common;
 use App\Common\Hydrate\CanHydrateInterface;
 use App\Foundation\Database\QueryBuilder;
 use App\Foundation\Database\DatabaseConnection;
+use App\Foundation\HTTP\Exceptions\NotFoundException;
 
 abstract class BaseModel implements CanHydrateInterface
 {
@@ -97,6 +98,17 @@ abstract class BaseModel implements CanHydrateInterface
             ->select()
             ->where(self::getPrimaryKey(), $value)
             ->first();
+    }
+
+    /**
+     * @throws NotFoundException
+     */
+    public static function findOrFail($value): ?BaseModel
+    {
+        return self::query()
+            ->select()
+            ->where(self::getPrimaryKey(), $value)
+            ->firstOrFail();
     }
 
     public function toArray(): array

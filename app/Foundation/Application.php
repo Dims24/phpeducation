@@ -3,11 +3,10 @@
 namespace App\Foundation;
 
 use App\Common\Patterns\Singleton;
-use App\Foundation\Config\Config;
 use App\Foundation\Exception\ExceptionHandler;
 use App\Foundation\HTTP\Request;
-use App\Helpers\Env\Env;
 use Foundation\Router\Router;
+use JetBrains\PhpStorm\NoReturn;
 
 class Application extends Singleton
 {
@@ -28,10 +27,15 @@ class Application extends Singleton
 
             $response->send();
 
-            exit(0);
+            $this->terminate();
         } catch (\Throwable $exception) {
             ExceptionHandler::handleException($exception);
         }
+    }
+
+    #[NoReturn] public function terminate()
+    {
+        exit(0);
     }
 
     /**

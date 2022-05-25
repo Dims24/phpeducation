@@ -10,10 +10,18 @@ use App\Models\Project;
 
 class ProjectController extends BaseController
 {
-    public function index()
+    public function index(Request $request)
     {
         $projects = Project::all();
 
         return $this->respond($projects);
+    }
+
+    public function show(Request $request, Project $project)
+    {
+        return $this->respond([
+            'project' => $project,
+            'router_variables' => $request->getRouterVariables()
+        ]);
     }
 }

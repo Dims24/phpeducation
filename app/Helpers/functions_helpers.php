@@ -14,6 +14,16 @@ if (!function_exists('config')) {
     }
 }
 
+if (!function_exists('path')) {
+    function path(string $filepath): mixed
+    {
+        /** @var \App\Foundation\Application $app */
+        $app = \App\Foundation\Application::getInstance();
+
+        return $app->getRootPath() . DIRECTORY_SEPARATOR . $filepath;
+    }
+}
+
 if (!function_exists('helper_array_is_assoc')) {
     /**
      * Determines if an array is associative.
