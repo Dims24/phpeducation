@@ -2,29 +2,23 @@
 
 namespace App\Foundation;
 
+use App\Common\Patterns\Singleton;
+use App\Foundation\Config\Config;
 use App\Foundation\Exception\ExceptionHandler;
 use App\Foundation\HTTP\Request;
+use App\Helpers\Env\Env;
 use Foundation\Router\Router;
 
-class Application
+class Application extends Singleton
 {
     protected Router $router;
-
-    public function __construct(
-        ?Router $router = null,
-    )
-    {
-        if (!is_null($router)) {
-            $this->router = $router;
-
-        } else {
-            $this->router = new Router(); #$this->router = [3]
-        }
-    }
+    protected string $root_path;
 
     #Функция запуска приложения
     public function run()
     {
+        $this->init();
+
         try {
             $this->initRouter();
 
@@ -40,6 +34,22 @@ class Application
         }
     }
 
+    /**
+     * @return string
+     */
+    public function getRootPath(): string
+    {
+        return $this->root_path;
+    }
+
+    /**
+     * @param  string  $root_path
+     */
+    public function setRootPath(string $root_path): void
+    {
+        $this->root_path = $root_path;
+    }
+
     public function captureRequest(): Request
     {
         $request = new Request();
@@ -52,5 +62,10 @@ class Application
     public function initRouter(): void
     {
         $this->router->compileRoutes();
+    }
+
+    protected function init(): void
+    {
+        $this->router = new Router();
     }
 }

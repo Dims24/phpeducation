@@ -31,11 +31,7 @@ abstract class BaseModel implements CanHydrateInterface
 
     public static function query(): QueryBuilder
     {
-        $connection = new DatabaseConnection(
-            database: "phptest",
-            username: "dataphp",
-            password: "1234"
-        );
+        $connection = new DatabaseConnection(...config('database.connection'));
 
         return new QueryBuilder(
             self::getSelfReflector()->getTable(),
@@ -50,7 +46,7 @@ abstract class BaseModel implements CanHydrateInterface
             return [];
         }
 
-        if (array_is_assoc($data)) {
+        if (helper_array_is_assoc($data)) {
             $data = [$data];
         }
 
@@ -89,23 +85,18 @@ abstract class BaseModel implements CanHydrateInterface
     {
         $query = self::query();
 
-        $result = $query
+        return $query
             ->select()
             ->get();
-
-        return self::hydrateFromCollection($result);
     }
 
     //Получение записи по id
     public static function find($value): ?BaseModel
     {
-        $result = self::query()
+        return self::query()
             ->select()
             ->where(self::getPrimaryKey(), $value)
-            ->first()
-        ;
-
-        return self::hydrateFromSingle($result);
+            ->first();
     }
 
     public function toArray(): array
