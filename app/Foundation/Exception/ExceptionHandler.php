@@ -3,8 +3,10 @@
 namespace App\Foundation\Exception;
 
 use App\Foundation\HTTP\Response;
+//use App\Foundation\Logger\Logger;
 use JetBrains\PhpStorm\NoReturn;
 use Throwable;
+use App\Foundation\Logger\Logger;
 
 class ExceptionHandler
 {
@@ -20,6 +22,8 @@ class ExceptionHandler
             'line' => $exception->getLine(),
             'trace' => $exception->getTrace(),
         ];
+        $log = new Logger("errors");
+        $log->log($exception_body);
 
         $response = new Response($exception_body, (int) $exception->getCode());
 
@@ -44,6 +48,9 @@ class ExceptionHandler
             'line' => $line,
             'context' => $context,
         ];
+
+        $log = new Logger("fatal_errors");
+        $log->log($error_body);
 
         $response = new Response($error_body, 400);
 

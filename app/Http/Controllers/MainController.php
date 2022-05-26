@@ -7,11 +7,13 @@ use App\Foundation\HTTP\Response;
 use App\Http\Common\BaseController;
 use App\Models\Article;
 
+
 class MainController extends BaseController
 {
     public function main(Request $sdjasndjkasbkjd)
     {
-        $article = Article::query()->select()->where("name", 1213214)->firstOrFail();
+        $article = Article::query()->select()->get();
+
         return $this->respond($article);
     }
 
@@ -25,12 +27,13 @@ class MainController extends BaseController
 
     }
 
-    public function namedRoute($test, $key)
+    public function show(Request $request, Article $article)
     {
-        $model = new Article();
 
-
-        dd($model->getRowByNameAndUserId($test, $key));
+        return $this->respond([
+            'article' => $article,
+            'router_variables' => $request->getRouterVariables()
+        ]);
     }
 
 }

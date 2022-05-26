@@ -3,7 +3,7 @@
 use Foundation\Router\Router;
 
 Router::get('/home', 'App\Http\Controllers\MainController@main');
-
+Router::get('/home/{article}', 'App\Http\Controllers\MainController@show');
 Router::get('/projects', 'App\Http\Controllers\ProjectController@index');
 Router::get('/projects/{project}', 'App\Http\Controllers\ProjectController@show');
 
