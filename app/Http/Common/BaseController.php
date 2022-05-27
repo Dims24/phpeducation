@@ -13,7 +13,10 @@ abstract class BaseController
         {
             $data = $data->toArray();
         }
-        $response = new Response($data, $code, $headers);
+
+        $response = new Response([
+            'data' => $data,
+        ], $code, $headers);
         return $response;
     }
 

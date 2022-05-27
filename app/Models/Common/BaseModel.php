@@ -36,6 +36,7 @@ abstract class BaseModel implements CanHydrateInterface
 
         return new QueryBuilder(
             self::getSelfReflector()->getTable(),
+            self::getPrimaryKey(),
             $connection->getConnection(),
             self::getSelfReflector()
         );
@@ -65,13 +66,12 @@ abstract class BaseModel implements CanHydrateInterface
             return null;
         }
 
+        $reflector = self::getSelfReflector();
+
         $tmp = new static();
-        $model_reflection = new \ReflectionClass(static::class);
-        foreach ($model_reflection->getProperties() as $model_property) {
-            if ($model_property->isPublic()) {
-                if (array_key_exists($model_property->getName(), $data)) {
-                    $tmp->{$model_property->getName()} = $data[$model_property->getName()];
-                }
+        foreach ($reflector->getFillable() as $column) {
+            if (array_key_exists($column, $data)) {
+                $tmp->{$column} = $data[$column];
             }
         }
 
@@ -115,15 +115,62 @@ abstract class BaseModel implements CanHydrateInterface
     {
         $result = [];
 
-        $model_reflection = new \ReflectionClass(static::class);
-        foreach ($model_reflection->getProperties() as $model_property) {
-            if ($model_property->isPublic()) {
-                $result[$model_property->getName()] = $this->{$model_property->getName()};
-            }
+        foreach ($this->getFillable() as $column) {
+            $result[$column] = $this->{$column};
         }
 
         return $result;
     }
 
+    public function save(): void
+    {
+        $data = $this->toArray();
+
+        if($data[self::getPrimaryKey()] == null){
+            $result = self::query()->insert($this->toArray());
+        }else{
+            $result = self::query()->update($this->toArray());
+        }
+
+
+        foreach ($this->getFillable() as $column)
+        {
+            $this->{$column} = $result->{$column};
+        }
+    }
+
+    public function delete(): void
+    {
+        $data = $this->toArray();
+
+        if($data[self::getPrimaryKey()] == null){
+            $result = self::query()->insert($this->toArray());
+        }else{
+            $result = self::query()->update($this->toArray());
+        }
+
+
+        foreach ($this->getFillable() as $column)
+        {
+            $this->{$column} = $result->{$column};
+        }
+    }
+
+    public function getFillable(): array
+    {
+        $reflector = new \ReflectionClass(static::class);
+        $properties = $reflector->getProperties();
+
+        $result = [];
+        foreach ($properties as $model_property)
+        {
+            if ($model_property->isPublic())
+            {
+                $result[] = $model_property->getName();
+            }
+        }
+
+        return $result;
+    }
 
 }

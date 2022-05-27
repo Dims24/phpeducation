@@ -5,6 +5,7 @@ namespace App\Foundation\Database;
 use App\Common\Hydrate\CanHydrateInterface;
 use App\Foundation\Database\Contracts\QueryBuilderInterface;
 use App\Foundation\HTTP\Exceptions\NotFoundException;
+use PDO;
 
 class QueryBuilder implements QueryBuilderInterface
 {
@@ -18,11 +19,25 @@ class QueryBuilder implements QueryBuilderInterface
     private int $offs;
 
     public function __construct(
-        protected string $table,
-        protected        $connection,
+        protected string               $table,
+        protected string               $primary_key,
+        protected PDO                  $connection,
         protected ?CanHydrateInterface $hydrate_model = null,
     )
     {
+    }
+
+    /**
+     * @return string
+     */
+    public function getPrimaryKey(): string
+    {
+        return $this->primary_key;
+    }
+
+    public function makeClearClone(): QueryBuilderInterface
+    {
+        return new QueryBuilder($this->table, $this->primary_key, $this->connection, $this->hydrate_model);
     }
 
     public function select(string|array $select = ["*"]): self
@@ -180,7 +195,6 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $this->limits = 1;
         $this->toSql();
-//        echo $this->query;
         $sth = $this->connection->prepare($this->query);
         $sth->execute($this->execute);
 
@@ -196,7 +210,6 @@ class QueryBuilder implements QueryBuilderInterface
     public function get(): mixed
     {
         $this->toSql();
-        echo $this->query;
         $sth = $this->connection->prepare($this->query);
         $sth->execute($this->execute);
 
@@ -208,4 +221,82 @@ class QueryBuilder implements QueryBuilderInterface
 
         return $result;
     }
+
+    public function insert(array $data): mixed
+    {
+        $this->toInsert($data);
+        $sth = $this->connection->prepare($this->query);
+        $sth->execute($this->execute);
+        $row_id = $this->connection->lastInsertId();
+
+        $query = $this->makeClearClone();
+
+        return $query->select()->where($query->getPrimaryKey(), $row_id)->first();
+    }
+
+    private function toInsert(array $data): string
+    {
+        foreach ($data as $key => $value) {
+            if ($key == "id") {
+                continue;
+            }
+            $this->fields[] = $key;
+            $this->execute[] = $value;
+        }
+
+        $this->query = "INSERT INTO " . $this->table . " (" . implode(", ", $this->fields) . ")"
+            . " VALUES " . "(" . str_repeat('?,', count($this->execute) - 1) . "?" . ")";
+
+        return $this->query;
+    }
+
+    public function update(array $data): mixed
+    {
+        $this->toUpdate($data);
+        $sth = $this->connection->prepare($this->query);
+        $sth->execute($this->execute);
+
+
+        $query = $this->makeClearClone();
+
+        return $query->select()->where($query->getPrimaryKey(), $data["id"])->first();
+    }
+
+    private function toUpdate(array $data): string
+    {
+        $text="";
+        foreach ($data as $key => $value) {
+            if ($key == "id") {
+                $id = $value;
+                continue;
+            }
+            if($value == end($data)) {
+                $text .= " {$key} = ? ";
+            }
+            else {
+                $text .= " {$key} = ?, ";
+            }
+
+            $this->execute[] = $value;
+        }
+        array_push($this->execute, $id);
+        $this->query = "UPDATE " . $this->table
+            . " SET " . $text
+            . "WHERE id = ?";
+
+        return $this->query;
+    }
+
+    public function delete(array $data): mixed
+    {
+        $this->toUpdate($data);
+        $sth = $this->connection->prepare($this->query);
+        $sth->execute($this->execute);
+
+
+        $query = $this->makeClearClone();
+
+        return $query->select()->where($query->getPrimaryKey(), $data["id"])->first();
+    }
+
 }

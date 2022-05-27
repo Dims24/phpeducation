@@ -12,19 +12,25 @@ class MainController extends BaseController
 {
     public function main(Request $sdjasndjkasbkjd)
     {
+
         $article = Article::query()->select()->get();
 
         return $this->respond($article);
     }
 
-    public function sayHello() : mixed
+    public function create(Request $request) : mixed
     {
-        $model = new Article();
-//        $model->name = 'test';
-//        $model->save();
+        $article = new Article();
 
-        dd($model->getAll());
+        foreach ($article->getFillable() as $column) {
+            if ($value = $request->get($column)) {
+                $article->$column = $value;
+            }
+        }
 
+        $article->save();
+
+        return $this->respond($article);
     }
 
     public function show(Request $request, Article $article)

@@ -15,4 +15,5 @@ interface QueryBuilderInterface
     public function count(): int;
     public function get(): mixed;
     public function first(): mixed;
+    public function getPrimaryKey(): string;
 }
