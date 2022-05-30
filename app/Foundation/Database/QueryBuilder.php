@@ -118,7 +118,7 @@ class QueryBuilder implements QueryBuilderInterface
         }
     }
 
-    public function whereIN(string|array $column, mixed $operator = null, mixed $value = null, string $boolean = 'AND'): self
+    public function whereIn(string|array $column, mixed $operator = null, mixed $value = null, string $boolean = 'AND'): self
     {
         if (!$this->conditions) {
             $boolean = ' WHERE';
@@ -315,7 +315,7 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function paginate($limit, $page): array
     {
-        $skip_lines = $limit * $page;
+        $skip_lines = 0;
         $this->limit($limit);
         $this->skip($skip_lines);
         $this->toSql();
