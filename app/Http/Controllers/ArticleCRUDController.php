@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Request;
-use App\Http\Common\BaseController;
+use App\Http\Common\BaseCRUDController;
 use App\Models\Article;
-use App\Models\Project;
 
-class ArticleCRUDController extends BaseController
+
+class ArticleCRUDController extends BaseCRUDController
 {
     public function index(Request $request)
     {
-        $projects = Article::all();
-
-        return $this->respond($projects);
+        return $this->respond(
+            $this->parentIndex(
+                request: $request,
+            )
+        );
     }
 
     public function show(Request $request, Article $article)
@@ -54,5 +57,15 @@ class ArticleCRUDController extends BaseController
     {
         $article->delete();
         return $this->respond('ok');
+    }
+
+    protected function getDefaultOrder(): array|string
+    {
+        return 'id';
+    }
+
+    protected function getQueryBuilder(): QueryBuilder
+    {
+        return Article::query()->select();
     }
 }

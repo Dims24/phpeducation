@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Helpers\Paginator;
+namespace App\Foundation\Database\Paginator;
 
 class Paginator
 {

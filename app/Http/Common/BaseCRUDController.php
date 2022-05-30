@@ -62,6 +62,7 @@ abstract class BaseCRUDController extends BaseController
             $limit = $request->get('limit') ?? $this->getOption('pagination.limit');
             $page = $request->get('page') ?? 1;
 
+
             $items = $builder->paginate($limit, $page);
         } else {
             $items = $builder->get();

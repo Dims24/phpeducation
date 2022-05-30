@@ -277,16 +277,15 @@ class QueryBuilder implements QueryBuilderInterface
 
     private function toUpdate(array $data): string
     {
-        $text="";
+        $text = "";
         foreach ($data as $key => $value) {
             if ($key == "id") {
                 $id = $value;
                 continue;
             }
-            if($value == end($data)) {
+            if ($value == end($data)) {
                 $text .= " {$key} = ? ";
-            }
-            else {
+            } else {
                 $text .= " {$key} = ?, ";
             }
 
@@ -302,10 +301,9 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function delete(array $data): void
     {
-        foreach ($data as $key=>$value)
-        {
+        foreach ($data as $key => $value) {
             if ($key == "id") {
-                $this->execute[]  = $value;
+                $this->execute[] = $value;
             }
         }
         $this->query = "DELETE FROM " . $this->table . " WHERE id = ?";
@@ -315,9 +313,12 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function paginate($limit, $page): array
     {
-        $skip_lines = 0;
         $this->limit($limit);
-        $this->skip($skip_lines);
+        if ($page > 1) {
+            $skip_lines = $limit * ($page-1);
+            $this->skip($skip_lines);
+        }
+
         $this->toSql();
         $sth = $this->connection->prepare($this->query);
         $sth->execute($this->execute);
