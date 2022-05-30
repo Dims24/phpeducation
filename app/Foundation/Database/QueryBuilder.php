@@ -79,14 +79,14 @@ class QueryBuilder implements QueryBuilderInterface
             /*
             VALUE IS ARRAY
             */
-            if (is_array($value)) {
-                foreach ($value as $val) {
-                    $this->execute[] = $val;
-                }
-                $value = str_repeat('?,', count($value) - 1) . '?';
-                $this->conditions[] = array($boolean, $column, $operator, "($value)");
-                return $this;
-            }
+//            if (is_array($value)) {
+//                foreach ($value as $val) {
+//                    $this->execute[] = $val;
+//                }
+//                $value = str_repeat('?,', count($value) - 1) . '?';
+//                $this->conditions[] = array($boolean, $column, $operator, "($value)");
+//                return $this;
+//            }
             $this->execute[] = $value;
             $this->conditions[] = array($boolean, $column, $operator, "?");
             return $this;
@@ -116,6 +116,20 @@ class QueryBuilder implements QueryBuilderInterface
         } else {
             return $this;
         }
+    }
+
+    public function whereIN(string|array $column, mixed $operator = null, mixed $value = null, string $boolean = 'AND'): self
+    {
+        if (!$this->conditions) {
+            $boolean = ' WHERE';
+        }
+
+        foreach ($value as $val) {
+            $this->execute[] = $val;
+        }
+        $value = str_repeat('?,', count($value) - 1) . '?';
+        $this->conditions[] = array($boolean, $column, $operator, "($value)");
+        return $this;
     }
 
     /**
@@ -287,16 +301,17 @@ class QueryBuilder implements QueryBuilderInterface
         return $this->query;
     }
 
-    public function delete(array $data): mixed
+    public function delete(array $data): void
     {
-        $this->toUpdate($data);
+        foreach ($data as $key=>$value)
+        {
+            if ($key == "id") {
+                $this->execute[]  = $value;
+            }
+        }
+        $this->query = "DELETE FROM " . $this->table . " WHERE id = ?";
         $sth = $this->connection->prepare($this->query);
         $sth->execute($this->execute);
-
-
-        $query = $this->makeClearClone();
-
-        return $query->select()->where($query->getPrimaryKey(), $data["id"])->first();
     }
 
 }

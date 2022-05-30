@@ -53,7 +53,6 @@ class ArticleCRUDController extends BaseController
     public function destroy(Request $request, Article $article)
     {
         $article->delete();
-
         return $this->respond('ok');
     }
 }

@@ -141,19 +141,7 @@ abstract class BaseModel implements CanHydrateInterface
 
     public function delete(): void
     {
-        $data = $this->toArray();
-
-        if($data[self::getPrimaryKey()] == null){
-            $result = self::query()->insert($this->toArray());
-        }else{
-            $result = self::query()->update($this->toArray());
-        }
-
-
-        foreach ($this->getFillable() as $column)
-        {
-            $this->{$column} = $result->{$column};
-        }
+        self::query()->delete($this->toArray());
     }
 
     public function getFillable(): array
