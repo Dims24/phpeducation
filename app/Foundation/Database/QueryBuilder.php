@@ -165,7 +165,6 @@ class QueryBuilder implements QueryBuilderInterface
     public function count(): int
     {
         $this->toSql();
-        echo $this->query;
         $sth = $this->connection->prepare($this->query);
         $sth->execute($this->execute);
         return $sth->rowCount();
@@ -314,4 +313,21 @@ class QueryBuilder implements QueryBuilderInterface
         $sth->execute($this->execute);
     }
 
+    public function paginate($limit, $page): array
+    {
+        $skip_lines = $limit * $page;
+        $this->limit($limit);
+        $this->skip($skip_lines);
+        $this->toSql();
+        $sth = $this->connection->prepare($this->query);
+        $sth->execute($this->execute);
+
+        $result = $sth->fetchAll();
+
+        if (!is_null($this->hydrate_model)) {
+            $result = $this->hydrate_model::hydrateFromCollection($result);
+        }
+
+        return $result;
+    }
 }
