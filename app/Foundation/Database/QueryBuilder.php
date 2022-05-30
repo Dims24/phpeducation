@@ -319,8 +319,7 @@ class QueryBuilder implements QueryBuilderInterface
             $this->skip($skip_lines);
         }
 
-        $this->toSql();
-        $sth = $this->connection->prepare($this->query);
+        $sth = $this->connection->prepare($this->toSql());
         $sth->execute($this->execute);
 
         $result = $sth->fetchAll();
