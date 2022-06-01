@@ -11,7 +11,7 @@ Router::put('/articles/{article}', 'App\Http\Controllers\ArticleCRUDController@u
 Router::delete('/articles/{article}', 'App\Http\Controllers\ArticleCRUDController@destroy');
 
 Router::get('/projects', 'App\Http\Controllers\ProjectController@index');
-Router::get('/projects/{project}', 'App\Http\Controllers\ProjectController@show');
-
-Router::post('/home', 'App\Http\Controllers\MainController@main');
-//Router::post('/home/{test}/test/{key}', '\MyProject\Controllers\MainController@main');
+Router::post('/projects', 'App\Http\Controllers\ProjectController@store');
+Router::get('/projects/{key}', 'App\Http\Controllers\ProjectController@show');
+Router::put('/projects/{key}', 'App\Http\Controllers\ProjectController@updated');
+Router::delete('/projects/{key}', 'App\Http\Controllers\ProjectController@destroy');

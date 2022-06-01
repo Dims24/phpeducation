@@ -3,6 +3,7 @@
 namespace App\Models\Common;
 
 use App\Common\Hydrate\CanHydrateInterface;
+use App\Foundation\Application;
 use App\Foundation\Database\QueryBuilder;
 use App\Foundation\Database\DatabaseConnection;
 use App\Foundation\HTTP\Exceptions\NotFoundException;
@@ -32,12 +33,12 @@ abstract class BaseModel implements CanHydrateInterface
 
     public static function query(): QueryBuilder
     {
-        $connection = new DatabaseConnection(...config('database.connection'));
-
+        /** @var Application $app */
+        $app = Application::getInstance();
         return new QueryBuilder(
             self::getSelfReflector()->getTable(),
             self::getPrimaryKey(),
-            $connection->getConnection(),
+            $app->getDatabaseConnection(),
             self::getSelfReflector()
         );
     }
@@ -125,13 +126,26 @@ abstract class BaseModel implements CanHydrateInterface
     public function save(): void
     {
         $data = $this->toArray();
+        $primary_value = null;
 
-        if($data[self::getPrimaryKey()] == null){
-            $result = self::query()->insert($this->toArray());
-        }else{
-            $result = self::query()->where(self::getPrimaryKey(), $data[self::getPrimaryKey()])->update($this->toArray());
+        if (array_key_exists(self::getPrimaryKey(), $data)) {
+            $primary_value = $data[self::getPrimaryKey()];
+            unset($data[self::getPrimaryKey()]);
         }
 
+        $result_data = [];
+
+        foreach ($data as $key => $value) {
+            if (!is_null($value)) {
+                $result_data[$key] = $value;
+            }
+        }
+
+        if(is_null($primary_value)){
+            $result = self::query()->insert($result_data);
+        }else{
+            $result = self::query()->where(self::getPrimaryKey(), $primary_value)->update($result_data);
+        }
 
         foreach ($this->getFillable() as $column)
         {

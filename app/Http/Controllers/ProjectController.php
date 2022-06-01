@@ -26,12 +26,44 @@ class ProjectController extends BaseCRUDController
         );
     }
 
-    public function show(Request $request, Project $project)
+
+    public function show(Request $request, $key)
     {
-        return $this->respond([
-            'project' => $project,
-            'router_variables' => $request->getRouterVariables()
-        ]);
+        return $this->respond(
+            $this->parentShow(
+                request: $request,
+                key: $key
+            )
+        );
+    }
+
+    public function store(Request $request)
+    {
+        return $this->respond(
+            $this->parentStore(
+                request: $request
+            )
+        );
+    }
+
+    public function updated(Request $request, $key)
+    {
+        return $this->respond(
+            $this->parentUpdate(
+                request: $request,
+                key: $key
+            )
+        );
+    }
+
+    public function destroy(Request $request, $key)
+    {
+        return $this->respond(
+            $this->parentDestroy(
+                request: $request,
+                key: $key
+            )
+        );
     }
 
     protected function getDefaultOrder(): array|string

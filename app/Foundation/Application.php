@@ -3,15 +3,19 @@
 namespace App\Foundation;
 
 use App\Common\Patterns\Singleton;
+use App\Foundation\Database\Contracts\DatabaseConnectionInterface;
+use App\Foundation\Database\DatabaseConnection;
 use App\Foundation\Exception\ExceptionHandler;
 use App\Foundation\HTTP\Request;
 use Foundation\Router\Router;
 use JetBrains\PhpStorm\NoReturn;
+use PDO;
 
 class Application extends Singleton
 {
     protected Router $router;
     protected string $root_path;
+    protected DatabaseConnectionInterface $database_connection;
 
     #Функция запуска приложения
     public function run()
@@ -36,6 +40,22 @@ class Application extends Singleton
     #[NoReturn] public function terminate()
     {
         exit(0);
+    }
+
+    /**
+     * @return PDO
+     */
+    public function getDatabaseConnection(): PDO
+    {
+        return $this->database_connection->getConnection();
+    }
+
+    /**
+     * @param  DatabaseConnection  $database_connection
+     */
+    public function setDatabaseConnection(DatabaseConnection $database_connection): void
+    {
+        $this->database_connection = $database_connection;
     }
 
     /**
@@ -71,5 +91,6 @@ class Application extends Singleton
     protected function init(): void
     {
         $this->router = new Router();
+        $this->setDatabaseConnection(new DatabaseConnection(...config('database.connection')));
     }
 }

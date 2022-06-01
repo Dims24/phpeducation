@@ -3,10 +3,13 @@
 namespace App\Http\Common;
 
 use App\Foundation\Database\QueryBuilder;
+use App\Foundation\HTTP\Exceptions\NotFoundException;
 use App\Foundation\HTTP\Request;
 use App\Helpers\Collection\Arr;
+use App\Models\Common\BaseModel;
 use Closure;
 use Exception;
+use Throwable;
 
 abstract class BaseCRUDController extends BaseController
 {
@@ -77,6 +80,174 @@ abstract class BaseCRUDController extends BaseController
         }
 
         return $items;
+    }
+
+    /**
+     * @throws NotFoundException
+     */
+    protected function parentShow(Request $request, $key, $options = [], \Closure $closure = null): BaseModel
+    {
+        $default_options = [];
+
+        $this->setOptions(array_merge_recursive_distinct($default_options, $options));
+
+        $this->setCurrentModel($this->getModelByKey($key));
+
+        if ($closure) {
+            $closure_result = $closure($this->current_model);
+            if ($closure_result && is_array($closure_result) && isset($closure_result['mode']) && $closure_result['mode'] == 'return') {
+                return $closure_result['result'];
+            }
+        }
+
+        return $this->current_model;
+    }
+
+    /**
+     * @param  Request  $request
+     * @param  array $options
+     * @param  Closure|null  $closure
+     * @return BaseModel
+     * @throws Throwable
+     */
+    protected function parentStore(Request $request, array $options = [], \Closure $closure = null): BaseModel
+    {
+        $default_options = [];
+
+        $this->setOptions(array_merge_recursive_distinct($default_options, $options));
+
+        $this->initFunction([
+            'action_type' => 'store',
+        ]);
+
+        foreach ($this->current_model->getFillable() as $column) {
+            if ($request->has($column)) {
+                $this->current_model->$column = $request->get($column);
+            }
+        }
+
+        if ($closure) {
+            $closure($this->current_model, 'before');
+        }
+
+        helper_database_begin_transaction();
+        try {
+            $this->current_model->save();
+
+            if ($closure) {
+                $closure($this->current_model, 'after');
+            }
+
+            helper_database_commit();
+
+            return $this->current_model;
+        } catch (Throwable $exception) {
+            helper_database_rollback();
+            throw $exception;
+        }
+    }
+
+    /**
+     * @param  Request  $request
+     * @param  $key
+     * @param  array $options
+     * @param  Closure|null  $closure
+     * @return BaseModel
+     * @throws Throwable
+     */
+    protected function parentUpdate(Request $request, $key, array $options = [], \Closure $closure = null): BaseModel
+    {
+        $default_options = [];
+
+        $this->setOptions(array_merge_recursive_distinct($default_options, $options));
+
+        $this->setCurrentModel($this->getModelByKey($key));
+
+        foreach ($this->current_model->getFillable() as $column) {
+            if ($request->has($column)) {
+                $this->current_model->$column = $request->get($column);
+            }
+        }
+
+        if ($closure) {
+            $closure($this->current_model, 'before');
+        }
+
+        helper_database_begin_transaction();
+        try {
+            $this->current_model->save();
+
+            if ($closure) {
+                $closure($this->current_model, 'after');
+            }
+
+            helper_database_commit();
+
+            return $this->current_model;
+        } catch (Throwable $exception) {
+            helper_database_rollback();
+            throw $exception;
+        }
+    }
+
+    /**
+     * @param  Request  $request
+     * @param  $key
+     * @param  array $options
+     * @param  Closure|null  $closure
+     * @return BaseModel
+     * @throws Throwable
+     */
+    protected function parentDestroy(Request $request, $key, array $options = [], \Closure $closure = null): BaseModel
+    {
+        $default_options = [];
+
+        $this->setOptions(array_merge_recursive_distinct($default_options, $options));
+
+        $this->setCurrentModel($this->getModelByKey($key));
+
+        foreach ($this->current_model->getFillable() as $column) {
+            if ($request->has($column)) {
+                $this->current_model->$column = $request->get($column);
+            }
+        }
+
+        if ($closure) {
+            $closure($this->current_model, 'before');
+        }
+
+        helper_database_begin_transaction();
+        try {
+            $this->current_model->delete();
+
+            if ($closure) {
+                $closure($this->current_model, 'after');
+            }
+
+            helper_database_commit();
+
+            return $this->current_model;
+        } catch (Throwable $exception) {
+            helper_database_rollback();
+            throw $exception;
+        }
+    }
+
+    /**
+     * Execute the query and get the first result or throw an exception.
+     *
+     * @param $key
+     * @return BaseModel
+     * @throws NotFoundException
+     */
+    protected function getModelByKey($key): BaseModel
+    {
+        $builder = $this->getQueryBuilder();
+
+        $primary_key = $this->current_model::getPrimaryKey();
+        $column = $this->current_model->getTable().'.'.$primary_key;
+
+        return $builder->where($column, $key)->firstOrFail();
     }
 
     /**

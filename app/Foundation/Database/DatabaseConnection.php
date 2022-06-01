@@ -122,14 +122,10 @@ class DatabaseConnection implements DatabaseConnectionInterface
         $this->password = $password;
     }
 
-
     public function getConnection(): PDO
     {
         return $this->connection;
     }
-
-
-
 
     public function setConnection(PDO $connection): void
     {
@@ -150,6 +146,4 @@ class DatabaseConnection implements DatabaseConnectionInterface
     {
         return "pgsql:host={$this->getHost()};port={$this->getPort()};dbname={$this->getDatabase()};";
     }
-
-
 }

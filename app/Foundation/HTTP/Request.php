@@ -166,6 +166,19 @@ class Request
         $this->files = $files;
     }
 
+    public function has(string $name): bool
+    {
+        if (array_key_exists($name, $this->query)) {
+            return true;
+        }
+
+        if (array_key_exists($name, $this->body)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function get(string $name): mixed
     {
         if (array_key_exists($name, $this->query)) {
