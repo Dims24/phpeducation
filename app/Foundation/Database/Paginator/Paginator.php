@@ -2,44 +2,93 @@
 
 namespace App\Foundation\Database\Paginator;
 
+use App\Models\Common\BaseModel;
+
 class Paginator
 {
-    #Ключ для query, в который пишется номер страницы
-    protected string $key_page = 'page';
-    protected string $key_limit = 'limit';
-
-    #Записей на страницу
-    protected int $limit;
-    #Текущая страница
-    protected int $current_page;
     #Последняя страница
     protected int $last_page;
-    #Следующая страница
-    protected int $per_page;
-    #Общее количество записей
-    protected int $total;
+    protected int $count;
 
+    public function __construct(
+        protected array $data,
+        protected int $limit,
+        protected int $current_page,
+        protected int $total,
 
-
-
-
-    # общего числа страниц
-    public function setLastPage(): int
+    )
     {
-        return ceil($this->total / $this->limit);
+        $this->last_page = $this->calcLastPage();
+        $this->count = count($this->data);
+    }
+
+    public function getPaginationInfo(): array
+    {
+        return [
+            'limit' => $this->getLimit(),
+            'total' => $this->getTotal(),
+            'current_page' => $this->getCurrentPage(),
+            'last_page' => $this->getLastPage(),
+            'count' => $this->getCount(),
+        ];
+    }
+
+    /**
+     * @return int
+     */
+    public function getCurrentPage(): int
+    {
+        return $this->current_page;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLastPage(): int
+    {
+        return $this->last_page;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getData(): mixed
+    {
+        return $this->data;
+    }
+
+    /**
+     * @return int
+     */
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTotal(): int
+    {
+        return $this->total;
+    }
+
+    /**
+     * @return int
+     */
+    public function getCount(): int
+    {
+        return $this->count;
     }
 
 
-    #установка текущей страницы
-    public function setCurrentPage($currentPage): int
+    /**
+     * Расчёт последней страницы
+     *
+     * @return int
+     */
+    protected function calcLastPage(): int
     {
-        $this->current_page = $currentPage;
-
-
-        if ($this->current_page > 0) {
-            if ($this->current_page > $this->setLastPage())
-                $this->current_page = $this->setLastPage();
-        } else
-            $this->current_page = 1;
+        return ceil($this->total / $this->limit);
     }
 }

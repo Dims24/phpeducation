@@ -4,6 +4,7 @@ namespace App\Foundation\Database;
 
 use App\Common\Hydrate\CanHydrateInterface;
 use App\Foundation\Database\Contracts\QueryBuilderInterface;
+use App\Foundation\Database\Paginator\Paginator;
 use App\Foundation\HTTP\Exceptions\NotFoundException;
 use PDO;
 
@@ -118,7 +119,7 @@ class QueryBuilder implements QueryBuilderInterface
         }
     }
 
-    public function whereIn(string|array $column, mixed $operator = null, mixed $value = null, string $boolean = 'AND'): self
+    public function whereIn(string|array $column, mixed $operator = "IN", mixed $value = null, string $boolean = 'AND'): self
     {
         if (!$this->conditions) {
             $boolean = ' WHERE';
@@ -127,6 +128,7 @@ class QueryBuilder implements QueryBuilderInterface
         foreach ($value as $val) {
             $this->execute[] = $val;
         }
+        $operator = "IN";
         $value = str_repeat('?,', count($value) - 1) . '?';
         $this->conditions[] = array($boolean, $column, $operator, "($value)");
         return $this;
@@ -164,21 +166,19 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function count(): int
     {
-        $this->toSql();
-        $sth = $this->connection->prepare($this->query);
+        $sth = $this->connection->prepare($this->toSql());
         $sth->execute($this->execute);
         return $sth->rowCount();
     }
 
     public function toSql(): string
     {
-        $this->query = 'SELECT ' . implode(', ', $this->fields)
+        return 'SELECT ' . implode(', ', $this->fields)
             . ' FROM ' . $this->table
             . $this->buildWhere()
             . (empty($this->sort_order) ? "" : ' ORDER BY' . " " . $this->sort_order)
             . (isset($this->limits) ? ' LIMIT ' . $this->limits : "")
             . (empty($this->offs) ? "" : ' OFFSET ' . $this->offs);
-        return $this->query;
     }
 
     private function buildWhere()
@@ -207,8 +207,7 @@ class QueryBuilder implements QueryBuilderInterface
     public function first(): mixed
     {
         $this->limits = 1;
-        $this->toSql();
-        $sth = $this->connection->prepare($this->query);
+        $sth = $this->connection->prepare($this->toSql());
         $sth->execute($this->execute);
 
         $result = $sth->fetch();
@@ -222,8 +221,7 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function get(): mixed
     {
-        $this->toSql();
-        $sth = $this->connection->prepare($this->query);
+        $sth = $this->connection->prepare($this->toSql());
         $sth->execute($this->execute);
 
         $result = $sth->fetchAll();
@@ -265,6 +263,7 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function update(array $data): mixed
     {
+
         $this->toUpdate($data);
         $sth = $this->connection->prepare($this->query);
         $sth->execute($this->execute);
@@ -279,10 +278,6 @@ class QueryBuilder implements QueryBuilderInterface
     {
         $text = "";
         foreach ($data as $key => $value) {
-            if ($key == "id") {
-                $id = $value;
-                continue;
-            }
             if ($value == end($data)) {
                 $text .= " {$key} = ? ";
             } else {
@@ -291,10 +286,13 @@ class QueryBuilder implements QueryBuilderInterface
 
             $this->execute[] = $value;
         }
-        array_push($this->execute, $id);
+
+        $tmp=array_shift($this->execute);
+        $this->execute[] = $tmp;
         $this->query = "UPDATE " . $this->table
             . " SET " . $text
-            . "WHERE id = ?";
+            . $this->buildWhere();
+
 
         return $this->query;
     }
@@ -311,23 +309,40 @@ class QueryBuilder implements QueryBuilderInterface
         $sth->execute($this->execute);
     }
 
-    public function paginate($limit, $page): array
+    public function paginate($limit, $page): Paginator
     {
+        $total = $this->count();
         $this->limit($limit);
         if ($page > 1) {
-            $skip_lines = $limit * ($page-1);
+            $skip_lines = $limit * ($page - 1);
             $this->skip($skip_lines);
         }
 
         $sth = $this->connection->prepare($this->toSql());
         $sth->execute($this->execute);
-
         $result = $sth->fetchAll();
+
 
         if (!is_null($this->hydrate_model)) {
             $result = $this->hydrate_model::hydrateFromCollection($result);
         }
 
-        return $result;
+        return new Paginator($result, $limit, $page, $total);
     }
+
+    public function beginTransaction(): void
+    {
+        $this->connection->beginTransaction();
+    }
+
+    public function commitTransaction(): void
+    {
+        $this->connection->commit();
+    }
+
+    public function rollBackTransaction(): void
+    {
+        $this->connection->rollBack();
+    }
+
 }

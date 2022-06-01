@@ -23,6 +23,7 @@ class ExceptionHandler
             'trace' => $exception->getTrace(),
         ];
         $log = new Logger("errors");
+
         $log->log($exception_body);
 
         $response = new Response($exception_body, (int) $exception->getCode());

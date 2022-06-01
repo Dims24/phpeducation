@@ -129,7 +129,7 @@ abstract class BaseModel implements CanHydrateInterface
         if($data[self::getPrimaryKey()] == null){
             $result = self::query()->insert($this->toArray());
         }else{
-            $result = self::query()->update($this->toArray());
+            $result = self::query()->where(self::getPrimaryKey(), $data[self::getPrimaryKey()])->update($this->toArray());
         }
 
 

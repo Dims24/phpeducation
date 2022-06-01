@@ -59,6 +59,7 @@ abstract class BaseCRUDController extends BaseController
         }
 
         if ($this->getOption('pagination.enable')) {
+
             $limit = $request->get('limit') ?? $this->getOption('pagination.limit');
             $page = $request->get('page') ?? 1;
 

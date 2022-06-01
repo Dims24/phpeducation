@@ -22,7 +22,11 @@ class ArticleCRUDController extends BaseCRUDController
     public function show(Request $request, Article $article)
     {
 
-        return $this->respond($article);
+        return $this->respond(
+            $this->parentIndex(
+                request: $request,
+            )
+        );
     }
 
     public function store(Request $request)
