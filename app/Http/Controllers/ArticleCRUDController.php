@@ -19,48 +19,43 @@ class ArticleCRUDController extends BaseCRUDController
         );
     }
 
-    public function show(Request $request, Article $article)
+    public function show(Request $request, $key)
     {
-
         return $this->respond(
-            $this->parentIndex(
+            $this->parentShow(
                 request: $request,
+                key: $key
             )
         );
     }
 
     public function store(Request $request)
     {
-        $article = new Article();
-
-        foreach ($article->getFillable() as $column) {
-            if ($value = $request->get($column)) {
-                $article->$column = $value;
-            }
-        }
-
-        $article->save();
-
-        return $this->respond($article);
+        return $this->respond(
+            $this->parentStore(
+                request: $request
+            )
+        );
     }
 
-    public function updated(Request $request, Article $article)
+    public function updated(Request $request, $key)
     {
-        foreach ($article->getFillable() as $column) {
-            if ($value = $request->get($column)) {
-                $article->$column = $value;
-            }
-        }
-
-        $article->save();
-
-        return $this->respond($article);
+        return $this->respond(
+            $this->parentUpdate(
+                request: $request,
+                key: $key
+            )
+        );
     }
 
-    public function destroy(Request $request, Article $article)
+    public function destroy(Request $request, $key)
     {
-        $article->delete();
-        return $this->respond('ok');
+        return $this->respond(
+            $this->parentDestroy(
+                request: $request,
+                key: $key
+            )
+        );
     }
 
     protected function getDefaultOrder(): array|string
