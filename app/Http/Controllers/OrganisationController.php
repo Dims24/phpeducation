@@ -4,21 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Request;
-use App\Foundation\HTTP\Response;
-use App\Http\Common\BaseController;
 use App\Http\Common\BaseCRUDController;
-use App\Http\Resources\Project\ProjectCollection;
-use App\Models\Article;
-use App\Models\Project;
+use App\Http\Resources\Organisation\OrganisationCollection;
+use App\Models\Organisation;
 
-class ProjectController extends BaseCRUDController
+class OrganisationController extends BaseCRUDController
 {
     public function __construct()
     {
-        $this->setCurrentModel(new Project());
+        $this->setCurrentModel(new Organisation());
 
-        $this->single_resource = \App\Http\Resources\Project\Project::class;
-        $this->collection_resource = ProjectCollection::class;
+        $this->single_resource = \App\Http\Resources\Organisation\Organisation::class;
+        $this->collection_resource = OrganisationCollection::class;
     }
 
     public function index(Request $request)
@@ -77,6 +74,6 @@ class ProjectController extends BaseCRUDController
 
     protected function getQueryBuilder(): QueryBuilder
     {
-        return Project::query()->select();
+        return Organisation::query()->select();
     }
 }

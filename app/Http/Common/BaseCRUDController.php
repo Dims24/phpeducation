@@ -2,10 +2,13 @@
 
 namespace App\Http\Common;
 
+use App\Foundation\Database\Paginator\Paginator;
 use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Exceptions\NotFoundException;
 use App\Foundation\HTTP\Request;
 use App\Helpers\Collection\Arr;
+use App\Http\Resources\Common\CollectionResource;
+use App\Http\Resources\Common\SingleResource;
 use App\Models\Common\BaseModel;
 use Closure;
 use Exception;
@@ -13,6 +16,9 @@ use Throwable;
 
 abstract class BaseCRUDController extends BaseController
 {
+    protected ?string $single_resource = null;
+    protected ?string $collection_resource = null;
+
     /**
      * @return array|string
      */
@@ -26,7 +32,7 @@ abstract class BaseCRUDController extends BaseController
     /**
      * @throws Exception
      */
-    protected function parentIndex(Request $request, array $options = [], Closure $closure = null)
+    protected function parentIndex(Request $request, array $options = [], Closure $closure = null): null|array|Paginator|CollectionResource
     {
         $default_options = [
             'filters' => [
@@ -79,13 +85,17 @@ abstract class BaseCRUDController extends BaseController
             }
         }
 
-        return $items;
+        if (is_null($this->collection_resource)) {
+            return $items;
+        } else {
+            return new $this->collection_resource($items);
+        }
     }
 
     /**
      * @throws NotFoundException
      */
-    protected function parentShow(Request $request, $key, $options = [], \Closure $closure = null): BaseModel
+    protected function parentShow(Request $request, $key, $options = [], \Closure $closure = null): BaseModel|SingleResource
     {
         $default_options = [];
 
@@ -100,7 +110,11 @@ abstract class BaseCRUDController extends BaseController
             }
         }
 
-        return $this->current_model;
+        if (is_null($this->single_resource)) {
+            return $this->current_model;
+        } else {
+            return new $this->single_resource($this->current_model);
+        }
     }
 
     /**
@@ -110,7 +124,7 @@ abstract class BaseCRUDController extends BaseController
      * @return BaseModel
      * @throws Throwable
      */
-    protected function parentStore(Request $request, array $options = [], \Closure $closure = null): BaseModel
+    protected function parentStore(Request $request, array $options = [], \Closure $closure = null): BaseModel|SingleResource
     {
         $default_options = [];
 
@@ -141,7 +155,11 @@ abstract class BaseCRUDController extends BaseController
 
             helper_database_commit();
 
-            return $this->current_model;
+            if (is_null($this->single_resource)) {
+                return $this->current_model;
+            } else {
+                return new $this->single_resource($this->current_model);
+            }
         } catch (Throwable $exception) {
             helper_database_rollback();
             throw $exception;
@@ -156,7 +174,7 @@ abstract class BaseCRUDController extends BaseController
      * @return BaseModel
      * @throws Throwable
      */
-    protected function parentUpdate(Request $request, $key, array $options = [], \Closure $closure = null): BaseModel
+    protected function parentUpdate(Request $request, $key, array $options = [], \Closure $closure = null): BaseModel|SingleResource
     {
         $default_options = [];
 
@@ -185,7 +203,11 @@ abstract class BaseCRUDController extends BaseController
 
             helper_database_commit();
 
-            return $this->current_model;
+            if (is_null($this->single_resource)) {
+                return $this->current_model;
+            } else {
+                return new $this->single_resource($this->current_model);
+            }
         } catch (Throwable $exception) {
             helper_database_rollback();
             throw $exception;
@@ -200,7 +222,7 @@ abstract class BaseCRUDController extends BaseController
      * @return BaseModel
      * @throws Throwable
      */
-    protected function parentDestroy(Request $request, $key, array $options = [], \Closure $closure = null): BaseModel
+    protected function parentDestroy(Request $request, $key, array $options = [], \Closure $closure = null): BaseModel|SingleResource
     {
         $default_options = [];
 
@@ -229,7 +251,11 @@ abstract class BaseCRUDController extends BaseController
 
             helper_database_commit();
 
-            return $this->current_model;
+            if (is_null($this->single_resource)) {
+                return $this->current_model;
+            } else {
+                return new $this->single_resource($this->current_model);
+            }
         } catch (Throwable $exception) {
             helper_database_rollback();
             throw $exception;

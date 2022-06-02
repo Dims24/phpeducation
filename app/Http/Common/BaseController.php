@@ -4,6 +4,8 @@ namespace App\Http\Common;
 
 use App\Foundation\Database\Paginator\Paginator;
 use App\Foundation\HTTP\Response;
+use App\Http\Resources\Common\CollectionResource;
+use App\Http\Resources\Common\SingleResource;
 use App\Models\Common\BaseModel;
 
 abstract class BaseController
@@ -92,6 +94,14 @@ abstract class BaseController
                 'data' => $data->getData(),
                 'meta' => $data->getPaginationInfo(),
             ], $code, $headers);
+
+            return $response;
+        } elseif($data instanceof CollectionResource) {
+            $response = new Response($data->toArray(), $code, $headers);
+
+            return $response;
+        } elseif($data instanceof SingleResource) {
+            $response = new Response(['data' => $data->toArray()], $code, $headers);
 
             return $response;
         } else {

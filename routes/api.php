@@ -50,3 +50,10 @@ Router::post('/projects', 'App\Http\Controllers\ProjectController@store');
 Router::get('/projects/{key}', 'App\Http\Controllers\ProjectController@show');
 Router::put('/projects/{key}', 'App\Http\Controllers\ProjectController@updated');
 Router::delete('/projects/{key}', 'App\Http\Controllers\ProjectController@destroy');
+
+Router::get('/organisations', 'App\Http\Controllers\OrganisationController@index');
+Router::post('/organisations/search', 'App\Http\Controllers\OrganisationController@index');
+Router::post('/organisations', 'App\Http\Controllers\OrganisationController@store');
+Router::get('/organisations/{key}', 'App\Http\Controllers\OrganisationController@show');
+Router::put('/organisations/{key}', 'App\Http\Controllers\OrganisationController@updated');
+Router::delete('/organisations/{key}', 'App\Http\Controllers\OrganisationController@destroy');
