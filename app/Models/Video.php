@@ -3,16 +3,19 @@ namespace App\Models;
 
 use App\Models\Common\BaseModel;
 
-class User extends BaseModel
+class Video extends BaseModel
 {
-    protected string $table = 'users';
+    protected string $table = "videos";
 
     /** @var int */
     public $id;
 
     /** @var string */
-    public $email;
+    public $user_id;
 
     /** @var string */
-    public $password;
+    public $name;
+
+    /** @var string */
+    public $url;
 }
