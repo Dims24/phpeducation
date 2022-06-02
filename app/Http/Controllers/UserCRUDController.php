@@ -5,14 +5,14 @@ namespace App\Http\Controllers;
 use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Request;
 use App\Http\Common\BaseCRUDController;
-use App\Models\Article;
+use App\Models\User;
 
 
-class ArticleCRUDController extends BaseCRUDController
+class UserCRUDController extends BaseCRUDController
 {
     public function __construct()
     {
-        $this->setCurrentModel(new Article());
+        $this->setCurrentModel(new User());
     }
 
     public function index(Request $request)
@@ -70,6 +70,6 @@ class ArticleCRUDController extends BaseCRUDController
 
     protected function getQueryBuilder(): QueryBuilder
     {
-        return Article::query()->select();
+        return User::query()->select();
     }
 }

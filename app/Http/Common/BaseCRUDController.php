@@ -126,11 +126,12 @@ abstract class BaseCRUDController extends BaseController
             }
         }
 
+        helper_database_begin_transaction();
+
         if ($closure) {
             $closure($this->current_model, 'before');
         }
 
-        helper_database_begin_transaction();
         try {
             $this->current_model->save();
 
@@ -169,11 +170,12 @@ abstract class BaseCRUDController extends BaseController
             }
         }
 
+        helper_database_begin_transaction();
+
         if ($closure) {
             $closure($this->current_model, 'before');
         }
 
-        helper_database_begin_transaction();
         try {
             $this->current_model->save();
 
@@ -212,11 +214,12 @@ abstract class BaseCRUDController extends BaseController
             }
         }
 
+        helper_database_begin_transaction();
+
         if ($closure) {
             $closure($this->current_model, 'before');
         }
 
-        helper_database_begin_transaction();
         try {
             $this->current_model->delete();
 
@@ -243,6 +246,7 @@ abstract class BaseCRUDController extends BaseController
     protected function getModelByKey($key): BaseModel
     {
         $builder = $this->getQueryBuilder();
+
 
         $primary_key = $this->current_model::getPrimaryKey();
         $column = $this->current_model->getTable().'.'.$primary_key;

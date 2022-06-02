@@ -261,17 +261,16 @@ class QueryBuilder implements QueryBuilderInterface
         return $this->query;
     }
 
-    public function update(array $data): mixed
+    public function update(array $data, array $where): mixed
     {
-
+        $this->where($where);
         $this->toUpdate($data);
         $sth = $this->connection->prepare($this->query);
         $sth->execute($this->execute);
 
-
         $query = $this->makeClearClone();
 
-        return $query->select()->where($query->getPrimaryKey(), $data["id"])->first();
+        return $query->select()->where($where)->first();
     }
 
     private function toUpdate(array $data): string

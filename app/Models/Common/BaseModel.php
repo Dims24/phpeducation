@@ -143,8 +143,8 @@ abstract class BaseModel implements CanHydrateInterface
 
         if(is_null($primary_value)){
             $result = self::query()->insert($result_data);
-        }else{
-            $result = self::query()->where(self::getPrimaryKey(), $primary_value)->update($result_data);
+        } else {
+            $result = self::query()->update($result_data, [self::getPrimaryKey() => $primary_value]);
         }
 
         foreach ($this->getFillable() as $column)

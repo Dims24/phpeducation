@@ -4,6 +4,12 @@ use Foundation\Router\Router;
 
 Router::get('/home', 'App\Http\Controllers\MainController@main');
 
+Router::get('/user', 'App\Http\Controllers\UserCRUDController@index');
+Router::post('/user', 'App\Http\Controllers\UserCRUDController@store');
+Router::get('/user/{key}', 'App\Http\Controllers\UserCRUDController@show');
+Router::put('/user/{key}', 'App\Http\Controllers\UserCRUDController@updated');
+Router::delete('/user/{key}', 'App\Http\Controllers\UserCRUDController@destroy');
+
 Router::get('/articles', 'App\Http\Controllers\ArticleCRUDController@index');
 Router::post('/articles', 'App\Http\Controllers\ArticleCRUDController@store');
 Router::get('/articles/{key}', 'App\Http\Controllers\ArticleCRUDController@show');
