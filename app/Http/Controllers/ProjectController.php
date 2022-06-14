@@ -7,7 +7,7 @@ use App\Foundation\HTTP\Request;
 use App\Foundation\HTTP\Response;
 use App\Http\Common\BaseController;
 use App\Http\Common\BaseCRUDController;
-use App\Http\Resources\Project\ProjectCollection;
+use App\Http\Resources\Project\UserCollection;
 use App\Models\Article;
 use App\Models\Project;
 
@@ -17,8 +17,8 @@ class ProjectController extends BaseCRUDController
     {
         $this->setCurrentModel(new Project());
 
-        $this->single_resource = \App\Http\Resources\Project\Project::class;
-        $this->collection_resource = ProjectCollection::class;
+        $this->single_resource = \App\Http\Resources\Project\User::class;
+        $this->collection_resource = UserCollection::class;
     }
 
     public function index(Request $request)

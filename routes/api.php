@@ -4,6 +4,12 @@ use Foundation\Router\Router;
 
 Router::get('/home', 'App\Http\Controllers\MainController@main');
 
+
+/**
+ * authorization
+ */
+Router::post('/auth/register', 'App\Http\Controllers\Auth\Authorization@register');
+Router::post('/auth/login', 'App\Http\Controllers\Auth\Authorization@login');
 /**
  * User
  */
@@ -44,6 +50,10 @@ Router::get('/comments/{key}', 'App\Http\Controllers\CommentCRUDController@show'
 Router::put('/comments/{key}', 'App\Http\Controllers\CommentCRUDController@updated');
 Router::delete('/comments/{key}', 'App\Http\Controllers\CommentCRUDController@destroy');
 
+
+/**
+ * Test data Vladislav
+ */
 Router::get('/projects', 'App\Http\Controllers\ProjectController@index');
 Router::post('/projects/search', 'App\Http\Controllers\ProjectController@index');
 Router::post('/projects', 'App\Http\Controllers\ProjectController@store');

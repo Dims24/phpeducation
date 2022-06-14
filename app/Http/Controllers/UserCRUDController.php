@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Request;
 use App\Http\Common\BaseCRUDController;
+use App\Http\Resources\User\UserCollection;
 use App\Models\User;
+
 
 
 class UserCRUDController extends BaseCRUDController
@@ -13,10 +15,14 @@ class UserCRUDController extends BaseCRUDController
     public function __construct()
     {
         $this->setCurrentModel(new User());
+
+        $this->single_resource = \App\Http\Resources\User\User::class;
+        $this->collection_resource = UserCollection::class;
     }
 
     public function index(Request $request)
     {
+
         return $this->respond(
             $this->parentIndex(
                 request: $request,

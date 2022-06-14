@@ -5,22 +5,21 @@ namespace App\Http\Controllers;
 use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Request;
 use App\Http\Common\BaseCRUDController;
-use App\Http\Resources\Comment\CommentCollection;
-use App\Models\Comment;
+use App\Http\Resources\User\UserCollection;
+use App\Models\UsersToken;
 
 
-class CommentCRUDController extends BaseCRUDController
+
+class UsersTokenCRUDController extends BaseCRUDController
 {
     public function __construct()
     {
-        $this->setCurrentModel(new Comment());
-
-        $this->single_resource = \App\Http\Resources\Comment\Comment::class;
-        $this->collection_resource = CommentCollection::class;
+        $this->setCurrentModel(new UsersToken());
     }
 
     public function index(Request $request)
     {
+
         return $this->respond(
             $this->parentIndex(
                 request: $request,
@@ -74,6 +73,6 @@ class CommentCRUDController extends BaseCRUDController
 
     protected function getQueryBuilder(): QueryBuilder
     {
-        return Comment::query()->select();
+        return UsersToken::query()->select();
     }
 }

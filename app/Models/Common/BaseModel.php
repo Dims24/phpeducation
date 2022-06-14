@@ -174,5 +174,4 @@ abstract class BaseModel implements CanHydrateInterface
 
         return $result;
     }
-
 }

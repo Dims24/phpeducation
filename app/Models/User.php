@@ -15,4 +15,10 @@ class User extends BaseModel
 
     /** @var string */
     public $password;
+
+    /** @var string */
+    public $hash;
+
+    /** @var string */
+    public $token;
 }

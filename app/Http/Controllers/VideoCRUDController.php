@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Request;
 use App\Http\Common\BaseCRUDController;
+use App\Http\Resources\Video\VideoCollection;
 use App\Models\Video;
 
 
@@ -13,6 +14,9 @@ class VideoCRUDController extends BaseCRUDController
     public function __construct()
     {
         $this->setCurrentModel(new Video);
+
+        $this->single_resource = \App\Http\Resources\Video\Video::class;
+        $this->collection_resource = VideoCollection::class;
     }
 
     public function index(Request $request)
