@@ -7,6 +7,7 @@ use App\Foundation\HTTP\Exceptions\NotFoundException;
 use App\Foundation\HTTP\Middlewares\MiddlewareContract;
 use App\Foundation\HTTP\Request;
 use App\Foundation\HTTP\Response;
+use App\Http\Middleware\Middleware;
 use App\Models\Common\BaseModel;
 use JetBrains\PhpStorm\ArrayShape;
 use ReflectionClass;
@@ -20,6 +21,7 @@ class Router
         'PUT' => [],
         'DELETE' => [],
     ];
+
 
     public function __construct()
     {

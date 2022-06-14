@@ -5,6 +5,7 @@ use Foundation\Router\Router;
 Router::get('/home', 'App\Http\Controllers\MainController@main');
 
 
+
 /**
  * authorization
  */
@@ -13,6 +14,7 @@ Router::post('/auth/login', 'App\Http\Controllers\Auth\Authorization@login');
 /**
  * User
  */
+
 Router::get('/users', 'App\Http\Controllers\UserCRUDController@index');
 Router::post('/users/search', 'App\Http\Controllers\UserCRUDController@index');
 Router::post('/users', 'App\Http\Controllers\UserCRUDController@store');

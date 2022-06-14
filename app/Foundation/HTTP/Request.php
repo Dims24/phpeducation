@@ -11,6 +11,7 @@ class Request
     protected string $path;
     protected string $host;
     protected array $query;
+    protected array $headars;
     protected array $body;
     protected array $files;
     protected array $router_variables = [];
@@ -21,6 +22,7 @@ class Request
         $this->uri = $_SERVER["REQUEST_URI"];
         $this->path = explode("?", $this->uri)[0];
         $this->host = $_SERVER["HTTP_HOST"];
+        $this->headars = getallheaders();
         $this->query = $_GET;
         $this->files = $_FILES;
 
@@ -36,6 +38,33 @@ class Request
         } else {
             $this->body = $_POST;
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getHeadars(): array
+    {
+        return $this->headars;
+    }
+
+    public function getHeadar($header): array
+    {
+        foreach ($this->headars as $key=>$value){
+            if ($key == $header){
+                return $value;
+            }else{
+                continue;
+            }
+        }
+    }
+
+    /**
+     * @param array $headars
+     */
+    public function setHeadars(array $headars): void
+    {
+        $this->headars = $headars;
     }
 
     /**

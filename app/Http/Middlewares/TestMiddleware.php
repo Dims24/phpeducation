@@ -10,6 +10,7 @@ class TestMiddleware extends AbstractMiddleware
 {
     public function handle(Request $request): ?Request
     {
+        dd($request);
         if ($request->get('test') !== 'test') {
             throw new \Exception('Forbidden', 401);
         }

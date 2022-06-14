@@ -10,6 +10,7 @@ class AuthMiddleware extends AbstractMiddleware
 {
     public function handle(Request $request): ?Request
     {
+        dd($request);
         if ($request->get('auth') !== 'auth') {
             throw new \Exception('Forbidden', 401);
         }
