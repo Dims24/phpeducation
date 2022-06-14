@@ -90,6 +90,7 @@ class Authorization extends BaseController
 
         if($mode == "login")
         {
+
             if(!password_verify($user_password, $this->gerHash($user_email))){
                 throw new RegistrationValidationException('Указан неверный пароль');
             }

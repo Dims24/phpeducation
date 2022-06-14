@@ -22,7 +22,7 @@ class Request
         $this->uri = $_SERVER["REQUEST_URI"];
         $this->path = explode("?", $this->uri)[0];
         $this->host = $_SERVER["HTTP_HOST"];
-        $this->headars = getallheaders();
+        $this->headars = $this->getHeadars();
         $this->query = $_GET;
         $this->files = $_FILES;
 
@@ -45,14 +45,17 @@ class Request
      */
     public function getHeadars(): array
     {
-        return $this->headars;
+        return $this->headars = getallheaders();
     }
 
-    public function getHeadar($header): array
+    public function getHeadar($header): string
     {
+        $this->getHeadars();
+        $header = strtolower($header);
         foreach ($this->headars as $key=>$value){
+            $key=strtolower($key);
             if ($key == $header){
-                return $value;
+                return $key;
             }else{
                 continue;
             }

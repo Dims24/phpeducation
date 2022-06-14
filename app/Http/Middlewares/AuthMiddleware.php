@@ -10,8 +10,9 @@ class AuthMiddleware extends AbstractMiddleware
 {
     public function handle(Request $request): ?Request
     {
-        dd($request);
-        if ($request->get('auth') !== 'auth') {
+
+        if ($request->getHeadar('Host') == 'Host') {
+            dd("xzcxc");
             throw new \Exception('Forbidden', 401);
         }
 

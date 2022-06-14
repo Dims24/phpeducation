@@ -10,8 +10,8 @@ class TestMiddleware extends AbstractMiddleware
 {
     public function handle(Request $request): ?Request
     {
-        dd($request);
-        if ($request->get('test') !== 'test') {
+
+        if ($request->getHeadar('Authorization') !== 'authorization') {
             throw new \Exception('Forbidden', 401);
         }
 

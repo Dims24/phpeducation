@@ -7,7 +7,6 @@ use App\Foundation\HTTP\Exceptions\NotFoundException;
 use App\Foundation\HTTP\Middlewares\MiddlewareContract;
 use App\Foundation\HTTP\Request;
 use App\Foundation\HTTP\Response;
-use App\Http\Middleware\Middleware;
 use App\Models\Common\BaseModel;
 use JetBrains\PhpStorm\ArrayShape;
 use ReflectionClass;
@@ -156,43 +155,10 @@ class Router
                     }
                 }
 
-                $middleware_classes = config('http.middlewares.global');
+                $middlewares = $this->chainFormationMiddleware();
 
-                /** @var MiddlewareContract[] $middlewares */
-                $middlewares = [];
+                $this->handleChainMiddleware($request,$middlewares);
 
-                if (count($middleware_classes) == 1) {
-                    /** @var MiddlewareContract $current_middleware */
-                    $current_middleware = new $middleware_classes[0]();
-                    $middlewares[] = $current_middleware;
-                } else {
-                    for ($i = count($middleware_classes) - 1; $i >= 0; $i--) {
-                        if ($i == count($middleware_classes) - 1) {
-                            continue;
-                        }
-
-                        if (!count($middlewares)) {
-                            /** @var MiddlewareContract $current_middleware */
-                            $current_middleware = new $middleware_classes[$i]();
-
-                            /** @var MiddlewareContract $current_middleware */
-                            $next_middleware = new $middleware_classes[$i + 1]();
-                            $current_middleware->next($next_middleware);
-                            $middlewares[] = $current_middleware;
-                        } else {
-                            /** @var MiddlewareContract $current_middleware */
-                            $current_middleware = new $middleware_classes[$i]();
-                            $current_middleware->next($middlewares[count($middlewares) - 1]);
-
-                            $middlewares[] = $current_middleware;
-                        }
-                    }
-                }
-
-                if (count($middlewares)) {
-                    $root = $middlewares[count($middlewares) - 1];
-                    $root->handle($request);
-                }
 
                 $controller = new $class();
 
@@ -203,5 +169,52 @@ class Router
         }
 
         throw new NotFoundException();
+    }
+
+
+    public function chainFormationMiddleware(): array
+    {
+        $middleware_classes = config('http.middlewares.global');
+
+        /** @var MiddlewareContract[] $middlewares */
+        $middlewares = [];
+
+        if (count($middleware_classes) == 1) {
+            /** @var MiddlewareContract $current_middleware */
+            $current_middleware = new $middleware_classes[0]();
+            $middlewares[] = $current_middleware;
+
+        } else {
+            for ($i = count($middleware_classes) - 1; $i >= 0; $i--) {
+                if ($i == count($middleware_classes) - 1) {
+                    continue;
+                }
+                if (!count($middlewares)) {
+                    /** @var MiddlewareContract $current_middleware */
+                    $current_middleware = new $middleware_classes[$i]();
+
+                    /** @var MiddlewareContract $current_middleware */
+                    $next_middleware = new $middleware_classes[$i + 1]();
+                    $current_middleware->next($next_middleware);
+                    $middlewares[] = $current_middleware;
+                } else {
+                    /** @var MiddlewareContract $current_middleware */
+                    $current_middleware = new $middleware_classes[$i]();
+                    $current_middleware->next($middlewares[count($middlewares) - 1]);
+
+                    $middlewares[] = $current_middleware;
+                }
+
+            }
+        }
+        return $middlewares;
+    }
+
+    public function handleChainMiddleware($request, $middlewares): void
+    {
+        if (count($middlewares)) {
+            $root = $middlewares[count($middlewares) - 1];
+            $root->handle($request);
+        }
     }
 }
