@@ -45,29 +45,29 @@ class Request
      */
     public function getHeaders(): array
     {
-        return $this->headers = getallheaders();
+        return $this->headars = getallheaders();
     }
 
-    public function getHeader($header): ?string
+    public function getHeader($header): string
     {
         $this->getHeaders();
         $header = strtolower($header);
-        foreach ($this->headers as $key => $value) {
-            $key = strtolower($key);
-            if ($key == $header) {
+        foreach ($this->headars as $key=>$value){
+            $key=strtolower($key);
+            if ($key == $header){
                 return $key;
+            }else{
+                continue;
             }
         }
-
-        return null;
     }
 
     /**
-     * @param  array  $headers
+     * @param array $headars
      */
-    public function setHeaders(array $headers): void
+    public function setHeadars(array $headars): void
     {
-        $this->headers = $headers;
+        $this->headars = $headars;
     }
 
     /**
@@ -143,7 +143,7 @@ class Request
     }
 
     /**
-     * @param  HTTPMethodsEnum  $method
+     * @param HTTPMethodsEnum $method
      */
     public function setMethod(HTTPMethodsEnum $method): void
     {
@@ -151,7 +151,7 @@ class Request
     }
 
     /**
-     * @param  string  $uri
+     * @param string $uri
      */
     public function setUri(string $uri): void
     {
@@ -159,7 +159,7 @@ class Request
     }
 
     /**
-     * @param  string  $path
+     * @param string $path
      */
     public function setPath(string $path): void
     {
@@ -167,7 +167,7 @@ class Request
     }
 
     /**
-     * @param  string  $host
+     * @param string $host
      */
     public function setHost(string $host): void
     {
@@ -175,7 +175,7 @@ class Request
     }
 
     /**
-     * @param  array  $query
+     * @param array $query
      */
     public function setQuery(array $query): void
     {
@@ -183,7 +183,7 @@ class Request
     }
 
     /**
-     * @param  array  $body
+     * @param array $body
      */
     public function setBody(array $body): void
     {
@@ -191,7 +191,7 @@ class Request
     }
 
     /**
-     * @param  array  $files
+     * @param array $files
      */
     public function setFiles(array $files): void
     {
