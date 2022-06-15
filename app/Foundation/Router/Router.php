@@ -210,6 +210,11 @@ class Router
         return $middlewares;
     }
 
+    /**
+     * @param $request
+     * @param MiddlewareContract[] $middlewares
+     * @return void
+     */
     public function handleChainMiddleware($request, $middlewares): void
     {
         if (count($middlewares)) {

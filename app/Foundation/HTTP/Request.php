@@ -11,7 +11,7 @@ class Request
     protected string $path;
     protected string $host;
     protected array $query;
-    protected array $headars;
+    protected array $headers;
     protected array $body;
     protected array $files;
     protected array $router_variables = [];
@@ -22,7 +22,7 @@ class Request
         $this->uri = $_SERVER["REQUEST_URI"];
         $this->path = explode("?", $this->uri)[0];
         $this->host = $_SERVER["HTTP_HOST"];
-        $this->headars = $this->getHeadars();
+        $this->headers = $this->getHeaders();
         $this->query = $_GET;
         $this->files = $_FILES;
 
@@ -43,31 +43,31 @@ class Request
     /**
      * @return array
      */
-    public function getHeadars(): array
+    public function getHeaders(): array
     {
-        return $this->headars = getallheaders();
+        return $this->headers = getallheaders();
     }
 
-    public function getHeadar($header): string
+    public function getHeader($header): ?string
     {
-        $this->getHeadars();
+        $this->getHeaders();
         $header = strtolower($header);
-        foreach ($this->headars as $key=>$value){
-            $key=strtolower($key);
-            if ($key == $header){
+        foreach ($this->headers as $key => $value) {
+            $key = strtolower($key);
+            if ($key == $header) {
                 return $key;
-            }else{
-                continue;
             }
         }
+
+        return null;
     }
 
     /**
-     * @param array $headars
+     * @param  array  $headers
      */
-    public function setHeadars(array $headars): void
+    public function setHeaders(array $headers): void
     {
-        $this->headars = $headars;
+        $this->headers = $headers;
     }
 
     /**
@@ -143,7 +143,7 @@ class Request
     }
 
     /**
-     * @param HTTPMethodsEnum $method
+     * @param  HTTPMethodsEnum  $method
      */
     public function setMethod(HTTPMethodsEnum $method): void
     {
@@ -151,7 +151,7 @@ class Request
     }
 
     /**
-     * @param string $uri
+     * @param  string  $uri
      */
     public function setUri(string $uri): void
     {
@@ -159,7 +159,7 @@ class Request
     }
 
     /**
-     * @param string $path
+     * @param  string  $path
      */
     public function setPath(string $path): void
     {
@@ -167,7 +167,7 @@ class Request
     }
 
     /**
-     * @param string $host
+     * @param  string  $host
      */
     public function setHost(string $host): void
     {
@@ -175,7 +175,7 @@ class Request
     }
 
     /**
-     * @param array $query
+     * @param  array  $query
      */
     public function setQuery(array $query): void
     {
@@ -183,7 +183,7 @@ class Request
     }
 
     /**
-     * @param array $body
+     * @param  array  $body
      */
     public function setBody(array $body): void
     {
@@ -191,7 +191,7 @@ class Request
     }
 
     /**
-     * @param array $files
+     * @param  array  $files
      */
     public function setFiles(array $files): void
     {
