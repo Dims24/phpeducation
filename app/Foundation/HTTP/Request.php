@@ -48,19 +48,19 @@ class Request
         return $this->headars = getallheaders();
     }
 
-    public function getHeader($header): string
+    public function getHeader($header): ?array
     {
         $this->getHeaders();
-        $header = strtolower($header);
         foreach ($this->headars as $key=>$value){
-            $key=strtolower($key);
             if ($key == $header){
-                return $key;
-            }else{
-                continue;
+                $meaning = [$key=>$value];
+                return $meaning;
             }
         }
+        return null;
     }
+
+
 
     /**
      * @param array $headars

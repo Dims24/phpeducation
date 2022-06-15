@@ -5,6 +5,7 @@ namespace App\Http\Middlewares;
 
 use App\Foundation\HTTP\Middlewares\AbstractMiddleware;
 use App\Foundation\HTTP\Request;
+use App\Http\Service\UserTokenManipulation;
 use App\Models\UsersToken;
 
 class TestMiddleware extends AbstractMiddleware
@@ -12,14 +13,13 @@ class TestMiddleware extends AbstractMiddleware
     public function handle(Request $request): ?Request
     {
 
-        $token = $request->getHeader('Authorization');
-        $token = str_replace('Bearer ','',$token);
 
-        $user_token = UsersToken::find($request->getHeader('Authorization'));
-        dd($user_token);
-
+        $token = new UserTokenManipulation();
+        $token->hasToken($request);
+        dd($token);
 
         if ($request->getHeader('Authorization') !== 'authorization') {
+            dd($request->getHeader('authorization') !== 'authorization');
             throw new \Exception('Forbidden', 401);
         }
 
