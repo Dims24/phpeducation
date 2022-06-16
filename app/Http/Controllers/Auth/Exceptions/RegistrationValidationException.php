@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth\Exceptions;
 
 use Exception;
 use Throwable;
-use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
 
 class RegistrationValidationException extends Exception
 {

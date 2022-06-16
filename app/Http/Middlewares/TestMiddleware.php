@@ -12,14 +12,9 @@ class TestMiddleware extends AbstractMiddleware
 {
     public function handle(Request $request): ?Request
     {
-
-
         $token = new UserTokenManipulation();
-        $token->hasToken($request);
-        dd($token);
 
-        if ($request->getHeader('Authorization') !== 'authorization') {
-            dd($request->getHeader('authorization') !== 'authorization');
+        if (!$token->hasToken($request)) {
             throw new \Exception('Forbidden', 401);
         }
 
