@@ -8,7 +8,6 @@ class UsersToken extends BaseModel
 {
     protected string $table = 'users_access_token';
 
-
     /** @var int */
     public $id;
 
@@ -26,4 +25,12 @@ class UsersToken extends BaseModel
 
     /** @var string */
     public $expired_at;
+
+    public function user(): User
+    {
+        /** @var User $user */
+        $user = User::find($this->user_id);
+
+        return $user;
+    }
 }

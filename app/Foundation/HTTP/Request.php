@@ -18,6 +18,7 @@ class Request
 
     public function initRequestFromGlobals(): void
     {
+        $this->setHeaders(getallheaders());
         $this->method = HTTPMethodsEnum::from($_SERVER['REQUEST_METHOD']);
         $this->uri = $_SERVER["REQUEST_URI"];
         $this->path = explode("?", $this->uri)[0];
@@ -25,6 +26,7 @@ class Request
         $this->headers = $this->getHeaders();
         $this->query = $_GET;
         $this->files = $_FILES;
+
 
         if (array_key_exists('CONTENT_TYPE', $_SERVER)) {
             switch ($_SERVER['CONTENT_TYPE']) {
@@ -45,13 +47,12 @@ class Request
      */
     public function getHeaders(): array
     {
-        return $this->headars = getallheaders();
+        return $this->headers;
     }
 
-    public function getHeader($header): ?array
+    public function getHeader(string $header): ?array
     {
-        $this->getHeaders();
-        foreach ($this->headars as $key=>$value){
+        foreach ($this->headers as $key=> $value){
             if ($key == $header){
                 $meaning = [$key=>$value];
                 return $meaning;
@@ -60,14 +61,17 @@ class Request
         return null;
     }
 
-
+    public function hasHeader(string $header): bool
+    {
+        return array_key_exists($header, $this->headers);
+    }
 
     /**
      * @param array $headars
      */
-    public function setHeadars(array $headars): void
+    public function setHeaders(array $headars): void
     {
-        $this->headars = $headars;
+        $this->headers = $headars;
     }
 
     /**

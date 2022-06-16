@@ -1,5 +1,12 @@
 <?php
 
+if (! function_exists('now')) {
+    function now(): DateTime
+    {
+        return new DateTime();
+    }
+}
+
 if (! function_exists('helper_database_begin_transaction')) {
     function helper_database_begin_transaction() : void
     {

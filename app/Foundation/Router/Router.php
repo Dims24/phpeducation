@@ -159,7 +159,6 @@ class Router
 
                 $this->handleChainMiddleware($request,$middlewares);
 
-
                 $controller = new $class();
 
 
