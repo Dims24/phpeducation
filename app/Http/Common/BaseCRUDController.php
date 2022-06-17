@@ -5,6 +5,7 @@ namespace App\Http\Common;
 use App\Foundation\Database\Paginator\Paginator;
 use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Exceptions\NotFoundException;
+use App\Foundation\HTTP\Middlewares\MiddlewareContract;
 use App\Foundation\HTTP\Request;
 use App\Helpers\Collection\Arr;
 use App\Http\Resources\Common\CollectionResource;
@@ -34,6 +35,7 @@ abstract class BaseCRUDController extends BaseController
      */
     protected function parentIndex(Request $request, array $options = [], Closure $closure = null): null|array|Paginator|CollectionResource
     {
+
         $default_options = [
             'filters' => [
                 'enable' => true,
@@ -45,12 +47,17 @@ abstract class BaseCRUDController extends BaseController
             'pagination' => [
                 'limit' => 10,
                 'enable' => true,
-            ],
+            ]
         ];
+
 
         $this->setOptions(array_merge_recursive_distinct($default_options, $options));
 
+
+
         $builder = $this->getQueryBuilder();
+
+
 
         if ($this->getOption('filters.enable')) {
             $builder = $this->addFilters($request, $builder);
@@ -118,9 +125,9 @@ abstract class BaseCRUDController extends BaseController
     }
 
     /**
-     * @param  Request  $request
-     * @param  array $options
-     * @param  Closure|null  $closure
+     * @param Request $request
+     * @param array $options
+     * @param Closure|null $closure
      * @return BaseModel
      * @throws Throwable
      */
@@ -167,10 +174,10 @@ abstract class BaseCRUDController extends BaseController
     }
 
     /**
-     * @param  Request  $request
+     * @param Request $request
      * @param  $key
-     * @param  array $options
-     * @param  Closure|null  $closure
+     * @param array $options
+     * @param Closure|null $closure
      * @return BaseModel
      * @throws Throwable
      */
@@ -215,10 +222,10 @@ abstract class BaseCRUDController extends BaseController
     }
 
     /**
-     * @param  Request  $request
+     * @param Request $request
      * @param  $key
-     * @param  array $options
-     * @param  Closure|null  $closure
+     * @param array $options
+     * @param Closure|null $closure
      * @return BaseModel
      * @throws Throwable
      */
@@ -275,14 +282,14 @@ abstract class BaseCRUDController extends BaseController
 
 
         $primary_key = $this->current_model::getPrimaryKey();
-        $column = $this->current_model->getTable().'.'.$primary_key;
+        $column = $this->current_model->getTable() . '.' . $primary_key;
 
         return $builder->where($column, $key)->firstOrFail();
     }
 
     /**
-     * @param  Request  $request
-     * @param  QueryBuilder  $builder
+     * @param Request $request
+     * @param QueryBuilder $builder
      * @return QueryBuilder
      * @throws Exception
      */
@@ -303,8 +310,8 @@ abstract class BaseCRUDController extends BaseController
      * 'not like', 'ilike', '&', '|', '^', '<<', '>>', 'rlike', 'not rlike',
      * 'regexp', 'not regexp','~', '~*', '!~', '!~*', 'similar to',
      * 'not similar to', 'not ilike', '~~*', '!~~*'
-     * @param  QueryBuilder  $builder
-     * @param  array  $filter
+     * @param QueryBuilder $builder
+     * @param array $filter
      * @return QueryBuilder
      * @throws Exception
      */
@@ -329,7 +336,7 @@ abstract class BaseCRUDController extends BaseController
         $boolean = $filter['boolean'] ?? 'and';
 
         if (!mb_stripos($column, '.')) {
-            $column = $this->current_model->getTable().'.'.$column;
+            $column = $this->current_model->getTable() . '.' . $column;
         }
 
         if (is_array($value)) {
@@ -340,8 +347,8 @@ abstract class BaseCRUDController extends BaseController
     }
 
     /**
-     * @param  Request  $request
-     * @param  QueryBuilder  $builder
+     * @param Request $request
+     * @param QueryBuilder $builder
      * @return QueryBuilder
      */
     protected function addOrders(Request $request, QueryBuilder $builder): QueryBuilder
@@ -364,8 +371,8 @@ abstract class BaseCRUDController extends BaseController
     }
 
     /**
-     * @param  QueryBuilder  $builder
-     * @param  string  $order
+     * @param QueryBuilder $builder
+     * @param string $order
      * @return QueryBuilder
      */
     protected function addOrder(QueryBuilder $builder, string $order): QueryBuilder

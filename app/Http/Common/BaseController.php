@@ -3,13 +3,17 @@
 namespace App\Http\Common;
 
 use App\Foundation\Database\Paginator\Paginator;
+use App\Foundation\HTTP\Middlewares\MiddlewareContract;
 use App\Foundation\HTTP\Response;
 use App\Http\Resources\Common\CollectionResource;
 use App\Http\Resources\Common\SingleResource;
 use App\Models\Common\BaseModel;
+use \ReflectionClass;
 
 abstract class BaseController
 {
+    protected ReflectionClass $reflection_class;
+
     /**
      * Controller base model.
      *
@@ -24,6 +28,44 @@ abstract class BaseController
      */
     protected array $options = [];
 
+    /**
+     * @var MiddlewareContract[]
+     */
+    protected array $middlewares = [];
+
+    /**
+     * @return MiddlewareContract[$method]
+     */
+    public function getMiddlewares(string $method): array
+    {
+        return $this->middlewares[$method];
+    }
+
+    /**
+     * @param MiddlewareContract[] $middlewares
+     */
+    public function setMiddlewares(array $middlewares): void
+    {
+        $this->middlewares = $middlewares;
+    }
+
+    public function setMiddleware(string $middleware): void
+    {
+        $this->middlewares[] = $middleware;
+    }
+
+    /**
+     * @return array
+     */
+    public function hasMiddleware(string $method): bool
+    {
+        foreach (array_keys($this->middlewares) as $value){
+            if ($value == $method){
+                return true;
+            }
+        }
+        return false;
+    }
     /**
      * @return BaseModel
      */
@@ -114,6 +156,27 @@ abstract class BaseController
             ], $code, $headers);
             return $response;
         }
+    }
+
+    public function middleware($middleware_class, array $methods = null)
+    {
+        $this->getReflectionMethod();
+        foreach ($methods as $method) {
+                $this->middlewares[$method][] = $middleware_class;
+            }
+
+        if (!$method) {
+            $this->middlewares[] = $middleware_class;
+        }
+    }
+
+    /**
+     * @return ReflectionClass
+     */
+    public function getReflectionMethod(): ReflectionClass
+    {
+        $this->reflection_class = new ReflectionClass($this);
+        dd($this->reflection_class->getMethod());
     }
 
 

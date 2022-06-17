@@ -8,6 +8,7 @@ use App\Foundation\HTTP\Exceptions\NotFoundException;
 use App\Foundation\HTTP\Middlewares\MiddlewareContract;
 use App\Foundation\HTTP\Request;
 use App\Foundation\HTTP\Response;
+use App\Http\Common\BaseController;
 use App\Models\Common\BaseModel;
 use JetBrains\PhpStorm\ArrayShape;
 use ReflectionClass;
@@ -178,14 +179,16 @@ class Router extends Singleton
 
                 $middlewares = $this->chainFormationMiddleware(config('http.middlewares.global'));
 
-                $this->handleChainMiddleware($request,$middlewares);
+                $this->handleChainMiddleware($request, $middlewares);
 
                 if ($route->hasMiddlewares()) {
                     $middlewares = $this->chainFormationMiddleware($route->getMiddlewares());
 
                     $this->handleChainMiddleware($request,$middlewares);
                 }
-
+                /**
+                 * @var BaseController $controller
+                 */
                 $controller = new $class();
 
                 if ($controller->hasMiddleware($method)) {
@@ -211,6 +214,7 @@ class Router extends Singleton
             /** @var MiddlewareContract $current_middleware */
             $current_middleware = new $middleware_classes[0]();
             $middlewares[] = $current_middleware;
+
 
         } else {
             for ($i = count($middleware_classes) - 1; $i >= 0; $i--) {
@@ -249,17 +253,5 @@ class Router extends Singleton
             $root = $middlewares[count($middlewares) - 1];
             $root->handle($request);
         }
-    }
-
-    public function middleware()
-    {
-        if( !empty($words) && count($words) )
-        {
-            foreach ($words as $w)
-            {
-                self::$data[] = $w;
-            }
-        }
-        return new static;
     }
 }
