@@ -28,7 +28,6 @@ class Router
 
     public function compileRoutes(): void
     {
-        #Возвращает 1
         $route_scheme = require_once path('routes/api.php');
     }
 
@@ -220,5 +219,17 @@ class Router
             $root = $middlewares[count($middlewares) - 1];
             $root->handle($request);
         }
+    }
+
+    public function middleware()
+    {
+        if( !empty($words) && count($words) )
+        {
+            foreach ($words as $w)
+            {
+                self::$data[] = $w;
+            }
+        }
+        return new static;
     }
 }

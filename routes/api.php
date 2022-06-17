@@ -15,7 +15,7 @@ Router::post('/auth/login', 'App\Http\Controllers\Auth\Authorization@login');
  * User
  */
 
-Router::get('/users', 'App\Http\Controllers\UserCRUDController@index');
+Router::get('/users', 'App\Http\Controllers\UserCRUDController@index')->middleware();
 Router::post('/users/search', 'App\Http\Controllers\UserCRUDController@index');
 Router::post('/users', 'App\Http\Controllers\UserCRUDController@store');
 Router::get('/users/{key}', 'App\Http\Controllers\UserCRUDController@show');
