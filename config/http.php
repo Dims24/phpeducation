@@ -3,7 +3,7 @@
 return [
     'middlewares' => [
         'global' => [
-            \App\Http\Middlewares\AuthMiddleware::class,
+//            \App\Http\Middlewares\AuthMiddleware::class,
         ],
     ]
 ];

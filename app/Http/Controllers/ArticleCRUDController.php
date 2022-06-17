@@ -15,6 +15,9 @@ class ArticleCRUDController extends BaseCRUDController
     {
         $this->setCurrentModel(new Article());
 
+        $this->middleware(TestMiddleware::class);
+        $this->middleware(TestMiddleware2::class, ['index', 'show']);
+
         $this->single_resource = \App\Http\Resources\Article\Article::class;
         $this->collection_resource = ArticleCollection::class;
     }

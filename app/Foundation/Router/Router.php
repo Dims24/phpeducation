@@ -2,6 +2,7 @@
 
 namespace Foundation\Router;
 
+use App\Common\Patterns\Singleton;
 use App\Foundation\HTTP\Enums\HTTPMethodsEnum;
 use App\Foundation\HTTP\Exceptions\NotFoundException;
 use App\Foundation\HTTP\Middlewares\MiddlewareContract;
@@ -12,52 +13,61 @@ use JetBrains\PhpStorm\ArrayShape;
 use ReflectionClass;
 use ReflectionException;
 
-class Router
+/**
+ * @method static Router getInstance();
+ */
+class Router extends Singleton
 {
-    protected static array $compiled_routes = [
+    protected array $compiled_routes = [
         'GET' => [],
         'POST' => [],
         'PUT' => [],
         'DELETE' => [],
     ];
 
-
-    public function __construct()
-    {
-    }
-
     public function compileRoutes(): void
     {
-        #Возвращает 1
         $route_scheme = require_once path('routes/api.php');
     }
 
     public function getCompiledRoutes(): array
     {
-        return self::$compiled_routes;
+        return $this->compiled_routes;
     }
 
-    public static function get(string $url, string $action): void
+    public static function get(string $url, string $action): Route
     {
-        self::setRouteToCompile(HTTPMethodsEnum::Get, $url, $action);
+        $self = self::getInstance();
+        $route = $self->setRouteToCompile(HTTPMethodsEnum::Get, $url, $action);
+
+        return $route;
     }
 
-    public static function post(string $url, string $action): void
+    public static function post(string $url, string $action): Route
     {
-        self::setRouteToCompile(HTTPMethodsEnum::Post, $url, $action);
+        $self = self::getInstance();
+        $route = $self->setRouteToCompile(HTTPMethodsEnum::Post, $url, $action);
+
+        return $route;
     }
 
-    public static function put(string $url, string $action): void
+    public static function put(string $url, string $action): Route
     {
-        self::setRouteToCompile(HTTPMethodsEnum::Put, $url, $action);
+        $self = self::getInstance();
+        $route = $self->setRouteToCompile(HTTPMethodsEnum::Put, $url, $action);
+
+        return $route;
     }
 
-    public static function delete(string $url, string $action): void
+    public static function delete(string $url, string $action): Route
     {
-        self::setRouteToCompile(HTTPMethodsEnum::Delete, $url, $action);
+        $self = self::getInstance();
+        $route = $self->setRouteToCompile(HTTPMethodsEnum::Delete, $url, $action);
+
+        return $route;
     }
 
-    protected static function setRouteToCompile(HTTPMethodsEnum $method, string $url, string $action): void
+    protected function setRouteToCompile(HTTPMethodsEnum $method, string $url, string $action): Route
     {
         $action_exploded = explode('@', $action);
         if (count($action_exploded) == 1) {
@@ -72,10 +82,20 @@ class Router
             ];
         }
 
-        self::$compiled_routes[$method->value][] = [
-            'url' => self::getRegexFromURL($url),
-            'controller' => $complete_action,
-        ];
+        $regex = self::getRegexFromURL($url);
+
+        $route = new Route(
+            method: $method,
+            path: $url,
+            pattern: $regex['pattern'],
+            variables: $regex['variables'],
+            controller_class: $complete_action['class'],
+            controller_method: $complete_action['method'],
+        );
+
+        $this->compiled_routes[$method->value][] = &$route;
+
+        return $route;
     }
 
     #[ArrayShape(['pattern' => "string", 'variables' => "array"])]
@@ -108,19 +128,20 @@ class Router
      */
     public function execute(Request $request): Response
     {
-        foreach (self::$compiled_routes[$request->getMethod()->value] as $action) {
-            if (preg_match($action["url"]['pattern'], $request->getPath(), $router_results)) {
+        /** @var Route $route */
+        foreach ($this->compiled_routes[$request->getMethod()->value] as $route) {
+            if (preg_match($route->pattern, $request->getPath(), $router_results)) {
                 $route_variables = [];
-                for ($i = 1; $i <= count($action['url']['variables']); $i++) {
+                for ($i = 1; $i <= count($route->variables); $i++) {
                     if (isset($router_results[$i])) {
-                        $route_variables[$action['url']['variables'][$i - 1]] = $router_results[$i];
+                        $route_variables[$route->variables[$i - 1]] = $router_results[$i];
                     }
                 }
 
                 $request->setRouterVariables($route_variables);
 
-                $class = $action['controller']['class'];
-                $method = $action['controller']['method'];
+                $class = $route->controller_class;
+                $method = $route->controller_method;
 
                 $executable_method_params = [];
                 $controller_reflection = new ReflectionClass($class);
@@ -155,13 +176,23 @@ class Router
                     }
                 }
 
-                $middlewares = $this->chainFormationMiddleware();
+                $middlewares = $this->chainFormationMiddleware(config('http.middlewares.global'));
 
                 $this->handleChainMiddleware($request,$middlewares);
 
+                if ($route->hasMiddlewares()) {
+                    $middlewares = $this->chainFormationMiddleware($route->getMiddlewares());
+
+                    $this->handleChainMiddleware($request,$middlewares);
+                }
+
                 $controller = new $class();
 
+                if ($controller->hasMiddleware($method)) {
+                    $middlewares = $this->chainFormationMiddleware($controller->getMiddlewares($method));
 
+                    $this->handleChainMiddleware($request,$middlewares);
+                }
 
                 return $controller->$method(...$executable_method_params);
             }
@@ -171,10 +202,8 @@ class Router
     }
 
 
-    public function chainFormationMiddleware(): array
+    public function chainFormationMiddleware(array $middleware_classes): array
     {
-        $middleware_classes = config('http.middlewares.global');
-
         /** @var MiddlewareContract[] $middlewares */
         $middlewares = [];
 

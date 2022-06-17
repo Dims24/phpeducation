@@ -12,7 +12,7 @@ class MainController extends BaseController
 {
     public function main(Request $sdjasndjkasbkjd)
     {
-
+        dd(1);
         $article = Article::query()->select()->get();
 
         return $this->respond($article);

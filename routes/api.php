@@ -2,7 +2,7 @@
 
 use Foundation\Router\Router;
 
-Router::get('/home', 'App\Http\Controllers\MainController@main');
+Router::get('/home', 'App\Http\Controllers\MainController@main')->middleware(\App\Http\Middlewares\AuthMiddleware::class)->name('HomePage');
 
 
 
