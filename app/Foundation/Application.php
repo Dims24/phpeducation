@@ -90,7 +90,7 @@ class Application extends Singleton
 
     protected function init(): void
     {
-        $this->router = new Router();
+        $this->router = Router::getInstance();
         $this->setDatabaseConnection(new DatabaseConnection(...config('database.connection')));
     }
 }
