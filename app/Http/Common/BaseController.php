@@ -12,7 +12,7 @@ use \ReflectionClass;
 
 abstract class BaseController
 {
-    protected ReflectionClass $reflection_class;
+    protected array $methods;
 
     /**
      * Controller base model.
@@ -32,6 +32,16 @@ abstract class BaseController
      * @var MiddlewareContract[]
      */
     protected array $middlewares = [];
+
+    /**
+     * @param array $methods
+     */
+//    public function __construct(array $methods)
+//    {
+//        $this->getReflectionMethod();;
+//        $this->methods = array_keys($this->middlewares);;
+//    }
+
 
     /**
      * @return MiddlewareContract[$method]
@@ -59,6 +69,7 @@ abstract class BaseController
      */
     public function hasMiddleware(string $method): bool
     {
+
         foreach (array_keys($this->middlewares) as $value){
             if ($value == $method){
                 return true;
@@ -160,7 +171,12 @@ abstract class BaseController
 
     public function middleware($middleware_class, array $methods = null)
     {
-        $this->getReflectionMethod();
+        if (!$methods){
+            $this->getReflectionMethod();
+            $methods = array_keys($this->middlewares);
+
+        }
+
         foreach ($methods as $method) {
                 $this->middlewares[$method][] = $middleware_class;
             }
@@ -170,14 +186,21 @@ abstract class BaseController
         }
     }
 
-    /**
-     * @return ReflectionClass
-     */
-    public function getReflectionMethod(): ReflectionClass
-    {
-        $this->reflection_class = new ReflectionClass($this);
-        dd($this->reflection_class->getMethod());
-    }
 
+    protected function getReflectionMethod(): void
+    {
+        $reflection_class = new ReflectionClass($this);
+        $array = $reflection_class->getMethods();
+        foreach ($array as $method) {
+            if ($method->class == $reflection_class->name)
+            {
+                if ($method->name == '__construct'){
+                    continue;
+                }
+                $this->middlewares[$method->name] = null;
+            }
+        }
+
+    }
 
 }
