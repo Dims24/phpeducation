@@ -14,8 +14,9 @@ class Article extends SingleResource
     public function toArray(): array
     {
         return [
+            'user_id' => $this->resource->user_id,
             'name' => $this->resource->name,
-            'description' => $this->resource->description,
+            'description' => $this->resource->article,
 //            'organisation' => (new Organisation($this->resource->organisation()))->toArray()
         ];
     }

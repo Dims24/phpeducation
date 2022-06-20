@@ -6,6 +6,7 @@ use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Request;
 use App\Http\Common\BaseCRUDController;
 use App\Http\Resources\Article\ArticleCollection;
+use App\Http\Exceptions\AccessDeniedException;
 use App\Models\Article;
 
 
@@ -45,7 +46,12 @@ class ArticleCRUDController extends BaseCRUDController
     {
         return $this->respond(
             $this->parentStore(
-                request: $request
+                request: $request,
+                closure: function (Article $model, string $mode) {
+                    if ($mode == 'before') {
+                        $model->user_id = current_user()->id;
+                    }
+                }
             )
         );
     }
@@ -55,7 +61,14 @@ class ArticleCRUDController extends BaseCRUDController
         return $this->respond(
             $this->parentUpdate(
                 request: $request,
-                key: $key
+                key: $key,
+                closure: function (Article $model, string $mode) {
+                    if ($mode == 'before') {
+                        if ($model->user_id !== current_user()->id) {
+                            throw new AccessDeniedException();
+                        }
+                    }
+                }
             )
         );
     }
@@ -65,7 +78,14 @@ class ArticleCRUDController extends BaseCRUDController
         return $this->respond(
             $this->parentDestroy(
                 request: $request,
-                key: $key
+                key: $key,
+                closure: function (Article $model, string $mode) {
+                    if ($mode == 'before') {
+                        if ($model->user_id !== current_user()->id) {
+                            throw new AccessDeniedException();
+                        }
+                    }
+                }
             )
         );
     }

@@ -5,7 +5,6 @@ namespace App\Http\Common;
 use App\Foundation\Database\Paginator\Paginator;
 use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Exceptions\NotFoundException;
-use App\Foundation\HTTP\Middlewares\MiddlewareContract;
 use App\Foundation\HTTP\Request;
 use App\Helpers\Collection\Arr;
 use App\Http\Resources\Common\CollectionResource;
@@ -89,6 +88,7 @@ abstract class BaseCRUDController extends BaseController
         if ($closure) {
             if ($filter_result = $closure($items, 'filter')) {
                 $items = $filter_result;
+                dd($items);
             }
         }
 
@@ -229,7 +229,7 @@ abstract class BaseCRUDController extends BaseController
      * @return BaseModel
      * @throws Throwable
      */
-    protected function parentDestroy(Request $request, $key, array $options = [], \Closure $closure = null): BaseModel|SingleResource
+    protected function parentDestroy(Request $request, $key, array $options = [], \Closure $closure = null): string| BaseModel|SingleResource
     {
         $default_options = [];
 
@@ -259,9 +259,9 @@ abstract class BaseCRUDController extends BaseController
             helper_database_commit();
 
             if (is_null($this->single_resource)) {
-                return $this->current_model;
+                return 'ok';
             } else {
-                return new $this->single_resource($this->current_model);
+                return 'ok';
             }
         } catch (Throwable $exception) {
             helper_database_rollback();

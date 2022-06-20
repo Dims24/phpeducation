@@ -1,4 +1,13 @@
 <?php
+if (! function_exists('current_user')) {
+    function current_user(): ?\App\Models\User
+    {
+        $user_token_service = \App\Http\Service\UserTokenService::getInstance();
+
+
+        return $user_token_service->getCurrentUserToken()?->user();
+    }
+}
 
 if (! function_exists('now')) {
     function now(): DateTime

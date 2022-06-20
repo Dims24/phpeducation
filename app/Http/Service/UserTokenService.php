@@ -5,7 +5,7 @@ namespace App\Http\Service;
 
 use App\Common\Patterns\Singleton;
 use App\Foundation\HTTP\Request;
-use App\Http\Service\Exceptions\AccessDeniedException;
+use App\Http\Exceptions\AccessDeniedException;
 use App\Http\Service\Exceptions\UserTokenExpiredException;
 use App\Models\UsersToken;
 
@@ -103,4 +103,6 @@ class UserTokenService extends Singleton
             return false;
         }
     }
+
+
 }

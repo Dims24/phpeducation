@@ -173,7 +173,8 @@ class QueryBuilder implements QueryBuilderInterface
 
     public function toSql(): string
     {
-        return 'SELECT ' . implode(', ', $this->fields)
+//        'SELECT ' . implode(', ', $this->fields)
+        return 'SELECT ' . (empty($this->fields) ? "*" : implode(', ', $this->fields))
             . ' FROM ' . $this->table
             . $this->buildWhere()
             . (empty($this->sort_order) ? "" : ' ORDER BY' . " " . $this->sort_order)
@@ -242,7 +243,7 @@ class QueryBuilder implements QueryBuilderInterface
 
         $query = $this->makeClearClone();
 
-        return $query->select()->where($query->getPrimaryKey(), $row_id)->first();
+        return $query->where($query->getPrimaryKey(), $row_id)->first();
     }
 
     private function toInsert(array $data): string

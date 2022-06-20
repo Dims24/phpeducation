@@ -17,5 +17,5 @@ class Article extends BaseModel
     public $name;
 
     /** @var string */
-    public $description;
+    public $article;
 }
