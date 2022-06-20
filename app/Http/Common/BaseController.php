@@ -169,7 +169,7 @@ abstract class BaseController
         }
     }
 
-    public function middleware($middleware_class, array $methods = null)
+    public function middleware($middleware_class, array $methods = null): void
     {
         if (!$methods){
             $this->getReflectionMethod();

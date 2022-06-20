@@ -18,4 +18,15 @@ class Video extends BaseModel
 
     /** @var string */
     public $url;
+
+    public function user(bool $execute = true)
+    {
+        $query = User::query()->select()->where('id', $this->user_id);
+
+        if ($execute) {
+            return $query->first();
+        } else {
+            return $query->get();
+        }
+    }
 }
