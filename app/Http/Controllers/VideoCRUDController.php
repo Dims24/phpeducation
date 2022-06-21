@@ -58,14 +58,7 @@ class VideoCRUDController extends BaseCRUDController
         return $this->respond(
             $this->parentUpdate(
                 request: $request,
-                key: $key,
-                closure: function (Video $model, string $mode) {
-                    if ($mode == 'before') {
-                        if ($model->user_id !== current_user()->id) {
-                            throw new AccessDeniedException();
-                        }
-                    }
-                }
+                key: $key
             )
         );
     }
@@ -75,14 +68,7 @@ class VideoCRUDController extends BaseCRUDController
         return $this->respond(
             $this->parentDestroy(
                 request: $request,
-                key: $key,
-                closure: function (Video $model, string $mode) {
-                    if ($mode == 'before') {
-                        if ($model->user_id !== current_user()->id) {
-                            throw new AccessDeniedException();
-                        }
-                    }
-                }
+                key: $key
             )
         );
     }

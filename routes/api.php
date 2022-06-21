@@ -47,10 +47,10 @@ Router::delete('/videos/{key}', 'App\Http\Controllers\VideoCRUDController@destro
  */
 Router::get('/comments', 'App\Http\Controllers\CommentCRUDController@index');
 Router::post('/comments/search', 'App\Http\Controllers\CommentCRUDController@index');
-Router::post('/comments', 'App\Http\Controllers\CommentCRUDController@store');
+Router::post('/comments', 'App\Http\Controllers\CommentCRUDController@store')->middleware(\App\Http\Middlewares\AuthMiddleware::class);
 Router::get('/comments/{key}', 'App\Http\Controllers\CommentCRUDController@show');
-Router::put('/comments/{key}', 'App\Http\Controllers\CommentCRUDController@updated');
-Router::delete('/comments/{key}', 'App\Http\Controllers\CommentCRUDController@destroy');
+Router::put('/comments/{key}', 'App\Http\Controllers\CommentCRUDController@updated')->middleware(\App\Http\Middlewares\AuthMiddleware::class);
+Router::delete('/comments/{key}', 'App\Http\Controllers\CommentCRUDController@destroy')->middleware(\App\Http\Middlewares\AuthMiddleware::class);
 
 
 /**

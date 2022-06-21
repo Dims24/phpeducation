@@ -6,7 +6,6 @@ use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Request;
 use App\Http\Common\BaseCRUDController;
 use App\Http\Resources\Article\ArticleCollection;
-use App\Http\Exceptions\AccessDeniedException;
 use App\Models\Article;
 
 
@@ -17,7 +16,7 @@ class ArticleCRUDController extends BaseCRUDController
         $this->setCurrentModel(new Article());
 
         $this->middleware(\App\Http\Middlewares\AuthMiddleware::class, ['index']);
-//        $this->middleware(\App\Http\Middlewares\TestMiddleware2::class, ['index', 'show']);
+//        $this->middleware(\App\Http\Middlewares\CheckOwner::class, ['updated', 'show']);
 
         $this->single_resource = \App\Http\Resources\Article\Article::class;
         $this->collection_resource = ArticleCollection::class;
@@ -62,13 +61,6 @@ class ArticleCRUDController extends BaseCRUDController
             $this->parentUpdate(
                 request: $request,
                 key: $key,
-                closure: function (Article $model, string $mode) {
-                    if ($mode == 'before') {
-                        if ($model->user_id !== current_user()->id) {
-                            throw new AccessDeniedException();
-                        }
-                    }
-                }
             )
         );
     }
@@ -79,13 +71,6 @@ class ArticleCRUDController extends BaseCRUDController
             $this->parentDestroy(
                 request: $request,
                 key: $key,
-                closure: function (Article $model, string $mode) {
-                    if ($mode == 'before') {
-                        if ($model->user_id !== current_user()->id) {
-                            throw new AccessDeniedException();
-                        }
-                    }
-                }
             )
         );
     }

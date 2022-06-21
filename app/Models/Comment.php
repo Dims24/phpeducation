@@ -2,8 +2,9 @@
 namespace App\Models;
 
 use App\Models\Common\BaseModel;
+use App\Models\Common\Interface\HasOwnerKey;
 
-class Comment extends BaseModel
+class Comment extends BaseModel implements HasOwnerKey
 {
     protected string $table = "comments";
 
@@ -13,11 +14,6 @@ class Comment extends BaseModel
     /** @var string */
     public $user_id;
 
-    /** @var string */
-    public $article_id;
-
-    /** @var string */
-    public $video_id;
 
     /** @var string */
     public $comment;
@@ -31,5 +27,10 @@ class Comment extends BaseModel
         } else {
             return $query->get();
         }
+    }
+
+    public function getOwnerId(): int
+    {
+        return $this->user_id;
     }
 }

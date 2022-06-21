@@ -59,13 +59,6 @@ class CommentCRUDController extends BaseCRUDController
             $this->parentUpdate(
                 request: $request,
                 key: $key,
-                closure: function (Comment $model, string $mode) {
-                    if ($mode == 'before') {
-                        if ($model->user_id !== current_user()->id) {
-                            throw new AccessDeniedException();
-                        }
-                    }
-                }
             )
         );
     }
@@ -75,14 +68,7 @@ class CommentCRUDController extends BaseCRUDController
         return $this->respond(
             $this->parentDestroy(
                 request: $request,
-                key: $key,
-                closure: function (Comment $model, string $mode) {
-                    if ($mode == 'before') {
-                        if ($model->user_id !== current_user()->id) {
-                            throw new AccessDeniedException();
-                        }
-                    }
-                }
+                key: $key
             )
         );
     }

@@ -9,7 +9,11 @@ use App\Foundation\HTTP\Request;
 use App\Helpers\Collection\Arr;
 use App\Http\Resources\Common\CollectionResource;
 use App\Http\Resources\Common\SingleResource;
+use App\Http\Service\CheckOwnerService;
+use App\Http\Service\Exceptions\AccessDeniedException;
 use App\Models\Common\BaseModel;
+use App\Models\Common\Interface\HasOwnerKey;
+use App\Models\User;
 use Closure;
 use Exception;
 use Throwable;
@@ -49,14 +53,9 @@ abstract class BaseCRUDController extends BaseController
             ]
         ];
 
-
         $this->setOptions(array_merge_recursive_distinct($default_options, $options));
 
-
-
         $builder = $this->getQueryBuilder();
-
-
 
         if ($this->getOption('filters.enable')) {
             $builder = $this->addFilters($request, $builder);
@@ -88,7 +87,6 @@ abstract class BaseCRUDController extends BaseController
         if ($closure) {
             if ($filter_result = $closure($items, 'filter')) {
                 $items = $filter_result;
-                dd($items);
             }
         }
 
@@ -189,6 +187,8 @@ abstract class BaseCRUDController extends BaseController
 
         $this->setCurrentModel($this->getModelByKey($key));
 
+        $this->checkOwnerIfNeedByCurrentUser($this->current_model);
+
         foreach ($this->current_model->getFillable() as $column) {
             if ($request->has($column)) {
                 $this->current_model->$column = $request->get($column);
@@ -229,13 +229,15 @@ abstract class BaseCRUDController extends BaseController
      * @return BaseModel
      * @throws Throwable
      */
-    protected function parentDestroy(Request $request, $key, array $options = [], \Closure $closure = null): string| BaseModel|SingleResource
+    protected function parentDestroy(Request $request, $key, array $options = [], \Closure $closure = null): string|BaseModel|SingleResource
     {
         $default_options = [];
 
         $this->setOptions(array_merge_recursive_distinct($default_options, $options));
 
         $this->setCurrentModel($this->getModelByKey($key));
+
+        $this->checkOwnerIfNeedByCurrentUser($this->current_model);
 
         foreach ($this->current_model->getFillable() as $column) {
             if ($request->has($column)) {
@@ -266,6 +268,22 @@ abstract class BaseCRUDController extends BaseController
         } catch (Throwable $exception) {
             helper_database_rollback();
             throw $exception;
+        }
+    }
+
+    /**
+     * @throws AccessDeniedException
+     */
+    protected function checkOwnerIfNeedByCurrentUser($current_model, ?User $user = null)
+    {
+        if (is_null($user)) {
+            $user = current_user();
+        }
+
+        #TODO: красоту
+        if ($current_model instanceof HasOwnerKey) {
+            $check_owner = new CheckOwnerService();
+            $check_owner->checkOwner($current_model, $user);
         }
     }
 

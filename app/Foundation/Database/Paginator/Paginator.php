@@ -2,7 +2,7 @@
 
 namespace App\Foundation\Database\Paginator;
 
-use App\Models\Common\BaseModel;
+
 
 class Paginator
 {

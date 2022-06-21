@@ -1,9 +1,11 @@
 <?php
 namespace App\Models;
 
+use App\Foundation\HTTP\Request;
 use App\Models\Common\BaseModel;
+use App\Models\Common\Interface\HasOwnerKey;
 
-class Article extends BaseModel
+class Article extends BaseModel implements HasOwnerKey
 {
     protected string $table = "articles";
 
@@ -28,5 +30,10 @@ class Article extends BaseModel
         } else {
             return $query->get();
         }
+    }
+
+    public function getOwnerId(): int
+    {
+        return $this->user_id;
     }
 }
