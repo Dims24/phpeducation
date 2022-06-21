@@ -280,10 +280,11 @@ abstract class BaseCRUDController extends BaseController
             $user = current_user();
         }
 
-        #TODO: красоту
-        if ($current_model instanceof HasOwnerKey) {
-            $check_owner = new CheckOwnerService();
-            $check_owner->checkOwner($current_model, $user);
+        if (current_user()->role != "admin") {
+            if ($current_model instanceof HasOwnerKey) {
+                $check_owner = new CheckOwnerService();
+                $check_owner->checkOwner($current_model, $user);
+            }
         }
     }
 

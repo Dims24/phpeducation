@@ -17,10 +17,7 @@ class User extends BaseModel
     public $password;
 
     /** @var string */
-    public $hash;
-
-    /** @var string */
-    public $token;
+    public $role;
 
     public function articles(bool $execute = true)
     {

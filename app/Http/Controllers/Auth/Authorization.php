@@ -22,6 +22,7 @@ class Authorization extends BaseController
         $user = new User();
         $user->email = $user_email;
         $user->password = password_hash($user_password, PASSWORD_DEFAULT);
+        $user->role = 'user';
         $user->save();
 
         return $this->respond($user, 201);
