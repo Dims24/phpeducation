@@ -13,8 +13,14 @@ class File
     public $name;
 
     /** @var string */
+    public $type;
+
+    /** @var string */
     public $essence;
 
     /** @var int */
     public $essence_id;
+
+    /** @var string */
+    public $path;
 }

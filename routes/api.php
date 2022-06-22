@@ -11,10 +11,11 @@ Router::get('/home', 'App\Http\Controllers\MainController@main')->middleware(\Ap
  */
 Router::post('/auth/register', 'App\Http\Controllers\Auth\Authorization@register');
 Router::post('/auth/login', 'App\Http\Controllers\Auth\Authorization@login');
+
+
 /**
  * User
  */
-
 Router::get('/users', 'App\Http\Controllers\UserCRUDController@index');
 Router::post('/users/search', 'App\Http\Controllers\UserCRUDController@index');
 Router::post('/users', 'App\Http\Controllers\UserCRUDController@store');

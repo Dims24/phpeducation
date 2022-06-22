@@ -46,9 +46,13 @@ class ArticleCRUDController extends BaseCRUDController
         return $this->respond(
             $this->parentStore(
                 request: $request,
-                closure: function (Article $model, string $mode) {
+                closure: function (Article $model, string $mode) use ($request) {
                     if ($mode == 'before') {
                         $model->user_id = current_user()->id;
+                    } else {
+                        foreach ($request->getFiles() as $file) {
+                            dd(__DIR__. '/../app/');
+                        }
                     }
                 }
             )
