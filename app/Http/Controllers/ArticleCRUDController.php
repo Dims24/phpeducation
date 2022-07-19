@@ -51,7 +51,9 @@ class ArticleCRUDController extends BaseCRUDController
                         $model->user_id = current_user()->id;
                     } else {
                         foreach ($request->getFiles() as $file) {
-                            dd(__DIR__. '/../app/');
+                            dd($file);
+                            move_uploaded_file($file['tmp_name'], 'C:\Users\Admin\PhpstormProjects\phpeducation\storage\app/'.$file['name']);
+
                         }
                     }
                 }
