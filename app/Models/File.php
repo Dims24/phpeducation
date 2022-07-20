@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class File
+use App\Models\Common\BaseModel;
+
+class File extends BaseModel
 {
     protected string $table = "files";
 

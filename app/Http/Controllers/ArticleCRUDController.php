@@ -6,7 +6,9 @@ use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Request;
 use App\Http\Common\BaseCRUDController;
 use App\Http\Resources\Article\ArticleCollection;
+use App\Http\Service\Storage;
 use App\Models\Article;
+use App\Models\File;
 
 
 class ArticleCRUDController extends BaseCRUDController
@@ -50,9 +52,15 @@ class ArticleCRUDController extends BaseCRUDController
                     if ($mode == 'before') {
                         $model->user_id = current_user()->id;
                     } else {
-                        foreach ($request->getFiles() as $file) {
+                        if ($request->getFiles()){
+                            $path = path("storage\app\\");
+                            $storage = new Storage($path);
 
-                            move_uploaded_file($file['tmp_name'], path("storage\app\\").$file['name']);
+                            foreach ($request->getFiles() as $file){
+                                $path_to_file = $storage->put($file);
+                                $this->addFiletoBD($path_to_file,$model);
+
+                            }
                         }
                     }
                 }
@@ -89,4 +97,19 @@ class ArticleCRUDController extends BaseCRUDController
     {
         return Article::query()->select();
     }
+
+    private function addFiletoBD($path, $model)
+    {
+
+        $file_bd = new File();
+        $name = explode("\\", $path);
+        $type = explode(".", $name[count($name)-1]);
+        $file_bd->path = $path;
+        $file_bd->name = $name[count($name)-1];
+        $file_bd->essence = $model->getTable();
+        $file_bd->essence_id = $model->id;
+        $file_bd->type = $type[count($type)-1];
+        $file_bd->save();
+    }
+
 }

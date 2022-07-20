@@ -14,17 +14,18 @@ class Storage
     {
     }
 
-    public function put($file)
+    public function put($file): string
     {
         $extension = $this->getExtension($file['name']);
 
         $name = uniqid();
         $broken_path = $this->makeDir($name);
+        $path_to_file = $broken_path . $name . "." . $extension;
+        move_uploaded_file($file['tmp_name'], $path_to_file);
 
+        $relative_path = explode($this->path, $path_to_file);
 
-        move_uploaded_file($file['tmp_name'], $broken_path . $name . "." . $extension);
-
-
+        return $relative_path[count($relative_path) - 1];
     }
 
     public function get($path)

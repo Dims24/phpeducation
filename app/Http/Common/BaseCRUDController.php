@@ -146,14 +146,7 @@ abstract class BaseCRUDController extends BaseController
             }
         }
 
-        if ($request->getFiles()){
-            $path = path("storage\app\\");
-            $storage = new Storage($path);
 
-            foreach ($request->getFiles() as $file){
-                $storage->put($file);
-            }
-        }
 
         helper_database_begin_transaction();
 
