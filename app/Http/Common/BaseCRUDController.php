@@ -11,6 +11,7 @@ use App\Http\Resources\Common\CollectionResource;
 use App\Http\Resources\Common\SingleResource;
 use App\Http\Service\CheckOwnerService;
 use App\Http\Service\Exceptions\AccessDeniedException;
+use App\Http\Service\Storage;
 use App\Models\Common\BaseModel;
 use App\Models\Common\Interface\HasOwnerKey;
 use App\Models\User;
@@ -142,6 +143,15 @@ abstract class BaseCRUDController extends BaseController
         foreach ($this->current_model->getFillable() as $column) {
             if ($request->has($column)) {
                 $this->current_model->$column = $request->get($column);
+            }
+        }
+
+        if ($request->getFiles()){
+            $path = path("storage\app\\");
+            $storage = new Storage($path);
+
+            foreach ($request->getFiles() as $file){
+                $storage->put($file);
             }
         }
 
