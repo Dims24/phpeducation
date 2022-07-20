@@ -7,11 +7,15 @@ use App\Models\File;
 
 class Storage
 {
+    protected const OCTET_LENGTH = 2;
 
     public function __construct(
-        protected string $path
+        protected string $path = ''
     )
     {
+        if ($this->path === '') {
+            $this->path = path("storage\app");
+        }
     }
 
     public function put($file): string
@@ -19,13 +23,13 @@ class Storage
         $extension = $this->getExtension($file['name']);
 
         $name = uniqid();
-        $broken_path = $this->makeDir($name);
-        $path_to_file = $broken_path . $name . "." . $extension;
+        $result_folder = $this->makeDir($name);
+        $path_to_file = $result_folder . DIRECTORY_SEPARATOR . $name . "." . $extension;
         move_uploaded_file($file['tmp_name'], $path_to_file);
 
-        $relative_path = explode($this->path, $path_to_file);
+        $relative_path = str_replace($this->path, '', $path_to_file);
 
-        return $relative_path[count($relative_path) - 1];
+        return $relative_path;
     }
 
     public function get($path)
@@ -35,14 +39,18 @@ class Storage
 
     private function makeDir(string $file_name): string
     {
-        $directory = str_split($file_name, 2);
-        $broken_path = $this->path . $directory[0] . "\\" . $directory[1] . "\\" . $directory[2] . "\\";
-        if (is_dir($broken_path)) {
-            return $broken_path;
-        } else {
-            mkdir($broken_path, 0777, true);
-            return $broken_path;
+        $sliced_directory_path = str_split($file_name, self::OCTET_LENGTH);
+        $result_folder = $this->path;
+
+        for ($i = 0; $i < 3; $i++) {
+            $result_folder .= DIRECTORY_SEPARATOR . $sliced_directory_path[$i];
         }
+
+        if (!is_dir($result_folder)) {
+            mkdir($result_folder, 0777, true);
+        }
+
+        return $result_folder;
     }
 
     private function getExtension(string $file_name){

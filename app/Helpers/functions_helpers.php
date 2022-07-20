@@ -66,7 +66,22 @@ if (!function_exists('path')) {
         /** @var \App\Foundation\Application $app */
         $app = \App\Foundation\Application::getInstance();
 
-        return $app->getRootPath() . DIRECTORY_SEPARATOR . $filepath;
+        return format_path($app->getRootPath() . DIRECTORY_SEPARATOR . $filepath);
+    }
+}
+
+if (!function_exists('format_path')) {
+    function format_path(string $path): string
+    {
+        if (str_contains($path, '/')) {
+            str_replace('/', DIRECTORY_SEPARATOR, $path);
+        }
+
+        if (str_contains($path, '\\')) {
+            str_replace('\\', DIRECTORY_SEPARATOR, $path);
+        }
+
+        return $path;
     }
 }
 

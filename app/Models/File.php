@@ -25,4 +25,23 @@ class File extends BaseModel
 
     /** @var string */
     public $path;
+
+    public static function make(string $path, ?BaseModel $model = null): File
+    {
+        $file = new File();
+        $name = explode("\\", $path);
+        $type = explode(".", $name[count($name) - 1]);
+        $file->path = $path;
+        $file->name = $name[count($name) - 1];
+
+        if (!is_null($model)) {
+            $file->essence = $model->getTable();
+            $file->essence_id = $model->id;
+        }
+
+        $file->type = $type[count($type) - 1];
+        $file->save();
+
+        return $file;
+    }
 }
