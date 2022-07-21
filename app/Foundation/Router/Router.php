@@ -36,12 +36,17 @@ class Router extends Singleton
         return $this->compiled_routes;
     }
 
-    public static function get(string $url, string $action): Route
+    public static function get(string $url, string $action): \Bramus\Router\Router
     {
-        $self = self::getInstance();
-        $route = $self->setRouteToCompile(HTTPMethodsEnum::Get, $url, $action);
+        $new = new \Bramus\Router\Router();
 
-        return $route;
+        $new->get($url, $action);
+
+        $new->run();
+//        $self = self::getInstance();
+//        $route = $self->setRouteToCompile(HTTPMethodsEnum::Get, $url, $action);
+//        dd($new);
+        return $new;
     }
 
     public static function post(string $url, string $action): Route

@@ -25,9 +25,11 @@ class ArticleCRUDController extends BaseCRUDController
         $this->collection_resource = ArticleCollection::class;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        dd($request);
+
+        $request = new Request;
+//        dd($new);
         return $this->respond(
             $this->parentIndex(
                 request: $request

@@ -217,6 +217,7 @@ class Request
 
     public function get(string $name): mixed
     {
+
         if (array_key_exists($name, $this->query)) {
             return $this->query[$name];
         }

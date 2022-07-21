@@ -3,6 +3,7 @@
 namespace App\Foundation\Exception;
 
 use App\Foundation\HTTP\Response;
+
 //use App\Foundation\Logger\Logger;
 use Carbon\Carbon;
 use JetBrains\PhpStorm\NoReturn;
@@ -26,7 +27,7 @@ class ExceptionHandler
 
         $log->log($exception_body);
 
-        $response = new Response($exception_body, (int) $exception->getCode());
+        $response = new Response($exception_body, (int)$exception->getCode());
 
         $response->send();
 
