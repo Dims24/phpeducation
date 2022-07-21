@@ -27,9 +27,7 @@ class ArticleCRUDController extends BaseCRUDController
 
     public function index(Request $request)
     {
-        $date = Carbon::now('Europe/Moscow')->format('Y-m-d H:i:s');
-
-        dd($date);
+        dd($request);
         return $this->respond(
             $this->parentIndex(
                 request: $request
