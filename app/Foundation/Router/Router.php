@@ -1,6 +1,6 @@
 <?php
 
-namespace Foundation\Router;
+namespace App\Foundation\Router;
 
 use App\Common\Patterns\Singleton;
 use App\Foundation\HTTP\Enums\HTTPMethodsEnum;

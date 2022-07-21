@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Foundation\Router;
+namespace App\Foundation\Router;
 
 use App\Foundation\HTTP\Enums\HTTPMethodsEnum;
 

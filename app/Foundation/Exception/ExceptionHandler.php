@@ -4,6 +4,7 @@ namespace App\Foundation\Exception;
 
 use App\Foundation\HTTP\Response;
 //use App\Foundation\Logger\Logger;
+use Carbon\Carbon;
 use JetBrains\PhpStorm\NoReturn;
 use Throwable;
 use App\Foundation\Logger\Logger;
@@ -13,9 +14,8 @@ class ExceptionHandler
 
     #[NoReturn] public static function handleException(Throwable $exception): void
     {
-
         $exception_body = [
-            'time' => date('Y-m-d H:i:s'),
+            'time' => Carbon::now('Europe/Moscow')->format('Y-m-d H:i:s'),
             'message' => $exception->getMessage(),
             'code' => $exception->getCode(),
             'file' => $exception->getFile(),
@@ -42,7 +42,7 @@ class ExceptionHandler
     ): bool
     {
         $error_body = [
-            'time' => date('Y-m-d H:i:s'),
+            'time' => Carbon::now('Europe/Moscow')->format('Y-m-d H:i:s'),
             'level' => $message,
             'code' => $error_level,
             'file' => $file,

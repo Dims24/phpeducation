@@ -1,4 +1,17 @@
 <?php
+use JetBrains\PhpStorm\NoReturn;
+
+if (!function_exists('dd')) {
+    #[NoReturn] function dd(...$args): void
+    {
+        foreach ($args as $arg) {
+            var_dump($arg);
+        }
+
+        exit(0);
+    }
+}
+
 if (! function_exists('current_user')) {
     function current_user(): ?\App\Models\User
     {

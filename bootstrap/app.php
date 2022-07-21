@@ -1,26 +1,5 @@
 <?php
 
-require_once 'global_helpers.php';
-date_default_timezone_set("Europe/Moscow");
-
-
-spl_autoload_register(function (string $className) {
-    $className = str_replace('App\\', '', $className);
-    require_once __DIR__ . '/../app/' . str_replace('\\', '/', $className) . '.php';
-});
-
-require_once '../app/Helpers/functions_helpers.php';
-
-set_exception_handler([
-    App\Foundation\Exception\ExceptionHandler::class,
-    'handleException'
-]);
-
-set_error_handler([
-    App\Foundation\Exception\ExceptionHandler::class,
-    'handleError'
-]);
-
 /** @var App\Foundation\Application $app */
 $app = App\Foundation\Application::getInstance();
 

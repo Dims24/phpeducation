@@ -7,7 +7,7 @@ use App\Foundation\Database\Contracts\DatabaseConnectionInterface;
 use App\Foundation\Database\DatabaseConnection;
 use App\Foundation\Exception\ExceptionHandler;
 use App\Foundation\HTTP\Request;
-use Foundation\Router\Router;
+use App\Foundation\Router\Router;
 use JetBrains\PhpStorm\NoReturn;
 use PDO;
 

@@ -9,6 +9,7 @@ use App\Http\Resources\Article\ArticleCollection;
 use App\Http\Service\Storage;
 use App\Models\Article;
 use App\Models\File;
+use Carbon\Carbon;
 
 
 class ArticleCRUDController extends BaseCRUDController
@@ -17,7 +18,7 @@ class ArticleCRUDController extends BaseCRUDController
     {
         $this->setCurrentModel(new Article());
 
-        $this->middleware(\App\Http\Middlewares\AuthMiddleware::class, ['index']);
+//        $this->middleware(\App\Http\Middlewares\AuthMiddleware::class, ['index']);
 //        $this->middleware(\App\Http\Middlewares\CheckOwner::class, ['updated', 'show']);
 
         $this->single_resource = \App\Http\Resources\Article\Article::class;
@@ -26,6 +27,9 @@ class ArticleCRUDController extends BaseCRUDController
 
     public function index(Request $request)
     {
+        $date = Carbon::now('Europe/Moscow')->format('Y-m-d H:i:s');
+
+        dd($date);
         return $this->respond(
             $this->parentIndex(
                 request: $request

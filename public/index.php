@@ -1,5 +1,5 @@
 <?php
-/** @var App\Application $app */
+require_once '../vendor/autoload.php';
 
 $app = require_once '../bootstrap/app.php';
 
