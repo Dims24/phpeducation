@@ -27,7 +27,7 @@ class ArticleCRUDController extends BaseCRUDController
 
     public function index()
     {
-        dd();
+//        dd(\GuzzleHttp\Psr7\Request::$class);
         return $this->respond(
             $this->parentIndex(
                 request: $request

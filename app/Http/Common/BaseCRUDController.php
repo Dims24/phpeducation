@@ -40,7 +40,7 @@ abstract class BaseCRUDController extends BaseController
      */
     protected function parentIndex(Request $request, array $options = [], Closure $closure = null): null|array|Paginator|CollectionResource
     {
-        dd($request);
+
 
         $default_options = [
             'filters' => [

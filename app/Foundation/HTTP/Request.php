@@ -22,13 +22,13 @@ class Request
      */
     public function initRequestFromGlobals(mixed $request): void
     {
-        dd($request);
+
         $this->setHeaders(getallheaders());
         $this->method = $request->getMethod();
 //        $this->uri = $_SERVER["REQUEST_URI"];
         $this->uri = $request->getUri();
         $this->path = $request->getUri()->getPath();
-        $this->host = $_SERVER["HTTP_HOST"];
+        $this->host = $request->getUri()->getHost();
         $this->headers = $this->getHeaders();
         $this->query = $_GET;
         $this->files = $_FILES;
