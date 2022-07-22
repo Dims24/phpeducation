@@ -17,7 +17,7 @@ class ArticleCRUDController extends BaseCRUDController
     {
         $this->setCurrentModel(new Article());
 
-        $this->middleware(\App\Http\Middlewares\AuthMiddleware::class, ['index']);
+//        $this->middleware(\App\Http\Middlewares\AuthMiddleware::class, ['index']);
 //        $this->middleware(\App\Http\Middlewares\CheckOwner::class, ['updated', 'show']);
 
         $this->single_resource = \App\Http\Resources\Article\Article::class;
@@ -26,6 +26,7 @@ class ArticleCRUDController extends BaseCRUDController
 
     public function index(Request $request)
     {
+
         return $this->respond(
             $this->parentIndex(
                 request: $request
