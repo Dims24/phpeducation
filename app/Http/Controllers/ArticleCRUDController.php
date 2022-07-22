@@ -29,7 +29,7 @@ class ArticleCRUDController extends BaseCRUDController
     {
 
         $request = new Request;
-//        dd($new);
+        dd($request);
         return $this->respond(
             $this->parentIndex(
                 request: $request

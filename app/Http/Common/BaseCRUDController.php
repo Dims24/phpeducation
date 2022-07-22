@@ -5,7 +5,8 @@ namespace App\Http\Common;
 use App\Foundation\Database\Paginator\Paginator;
 use App\Foundation\Database\QueryBuilder;
 use App\Foundation\HTTP\Exceptions\NotFoundException;
-use App\Foundation\HTTP\Request;
+//use App\Foundation\HTTP\Request;
+use GuzzleHttp\Psr7\Request;
 use App\Helpers\Collection\Arr;
 use App\Http\Resources\Common\CollectionResource;
 use App\Http\Resources\Common\SingleResource;
@@ -39,6 +40,7 @@ abstract class BaseCRUDController extends BaseController
      */
     protected function parentIndex(Request $request, array $options = [], Closure $closure = null): null|array|Paginator|CollectionResource
     {
+        dd($request);
 
         $default_options = [
             'filters' => [
@@ -57,7 +59,7 @@ abstract class BaseCRUDController extends BaseController
         $this->setOptions(array_merge_recursive_distinct($default_options, $options));
 
         $builder = $this->getQueryBuilder();
-
+        ;
         if ($this->getOption('filters.enable')) {
             $builder = $this->addFilters($request, $builder);
         }
@@ -72,17 +74,18 @@ abstract class BaseCRUDController extends BaseController
                 $builder = $tmp_builder;
             }
         }
-
-        if ($this->getOption('pagination.enable')) {
-
-            $limit = $request->get('limit') ?? $this->getOption('pagination.limit');
-            $page = $request->get('page') ?? 1;
-
-
-            $items = $builder->paginate($limit, $page);
-        } else {
-            $items = $builder->get();
-        }
+        $items = $builder->get();
+//        if ($this->getOption('pagination.enable')) {
+//
+//            $limit = $request->get('limit') ?? $this->getOption('pagination.limit');
+//
+//            $page = $request->get('page') ?? 1;
+//
+//
+//            $items = $builder->paginate($limit, $page);
+//        } else {
+//            $items = $builder->get();
+//        }
 
 
         if ($closure) {
@@ -317,6 +320,7 @@ abstract class BaseCRUDController extends BaseController
      */
     protected function addFilters(Request $request, QueryBuilder $builder): QueryBuilder
     {
+        dd($request);
         $filters = $request->get('filter') ?? [];
 
         foreach ($filters as $filter) {

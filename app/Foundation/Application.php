@@ -86,11 +86,13 @@ class Application extends Singleton
     public function initRouter(): void
     {
         $this->router->compileRoutes();
+
     }
 
     protected function init(): void
     {
         $this->router = Router::getInstance();
+
         $this->setDatabaseConnection(new DatabaseConnection(...config('database.connection')));
     }
 }
