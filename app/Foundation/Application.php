@@ -25,7 +25,7 @@ class Application extends Singleton
 
         try {
 //            $this->initRouter();
-//            dd($this->router,$this->captureRequest());
+            dd($this->router,$this->captureRequest());
             $response = $this->router->run();
 
 
@@ -81,7 +81,8 @@ class Application extends Singleton
 
 
         $request->initRequestFromGlobals();
-//        dd($request);
+
+
         return $request;
     }
 

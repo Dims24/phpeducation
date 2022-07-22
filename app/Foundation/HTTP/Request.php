@@ -18,6 +18,7 @@ class Request
 
     public function initRequestFromGlobals(): void
     {
+        dd(1);
         $this->setHeaders(getallheaders());
         $this->method = HTTPMethodsEnum::from($_SERVER['REQUEST_METHOD']);
         $this->uri = $_SERVER["REQUEST_URI"];
