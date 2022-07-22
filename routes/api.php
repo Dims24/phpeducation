@@ -14,6 +14,7 @@ $new = new Router();
 
 $new->get('/articles', 'App\Http\Controllers\ArticleCRUDController@index');
 $new->get('/article', 'App\Http\Controllers\ArticleCRUDController@index');
+
 return $new;
 //Router::get('/articles', 'App\Http\Controllers\ArticleCRUDController@index');
 //Router::post('/articles/search', 'App\Http\Controllers\ArticleCRUDController@index');

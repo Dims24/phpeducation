@@ -8,6 +8,7 @@ use App\Foundation\Database\DatabaseConnection;
 use App\Foundation\Exception\ExceptionHandler;
 use App\Foundation\HTTP\Request;
 //use App\Foundation\Router\Router;
+use GuzzleHttp\Client;
 use JetBrains\PhpStorm\NoReturn;
 use Bramus\Router\Router;
 use PDO;
@@ -25,6 +26,7 @@ class Application extends Singleton
 
         try {
 //            $this->initRouter();
+
             dd($this->router,$this->captureRequest());
             $response = $this->router->run();
 
@@ -75,8 +77,14 @@ class Application extends Singleton
         $this->root_path = $root_path;
     }
 
-    public function captureRequest(): Request
+    public function captureRequest(): \GuzzleHttp\Psr7\Request
     {
+//        $client = new Client(['base_uri' => 'http://localhost:8000']);
+        dd($this->router);
+        $request = new \GuzzleHttp\Psr7\Request($this->router->getRequestMethod(), 'http://localhost:8000/articles');
+        dd($request);
+        $response = $client->request($this->router->getRequestMethod(), $this->router->getCurrentUri());
+
         $request = new Request();
 
 
@@ -90,7 +98,7 @@ class Application extends Singleton
     {
 //        $this->router->compileRoutes();
         $this->router = require_once path('routes/api.php');
-        dd($this->router);
+
     }
 
 
