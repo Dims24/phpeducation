@@ -6,9 +6,16 @@
 //$router->post('/articles/search', 'App\Http\Controllers\ArticleCRUDController@index');
 //
 //$router->run();
-use App\Foundation\Router\Router;
+//use App\Foundation\Router\Router;
 
-Router::get('/articles', 'App\Http\Controllers\ArticleCRUDController@index');
+use Bramus\Router\Router;
+
+$new = new Router();
+
+$new->get('/articles', 'App\Http\Controllers\ArticleCRUDController@index');
+$new->get('/article', 'App\Http\Controllers\ArticleCRUDController@index');
+return $new;
+//Router::get('/articles', 'App\Http\Controllers\ArticleCRUDController@index');
 //Router::post('/articles/search', 'App\Http\Controllers\ArticleCRUDController@index');
 //Router::post('/articles', 'App\Http\Controllers\ArticleCRUDController@store')->middleware(\App\Http\Middlewares\AuthMiddleware::class);
 //Router::get('/articles/{key}', 'App\Http\Controllers\ArticleCRUDController@show');

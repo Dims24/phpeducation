@@ -10,7 +10,7 @@ class Request
     protected string $uri;
     protected string $path;
     protected string $host;
-    protected string $query;
+    protected array $query;
     protected array $headers;
     protected array $body;
     protected array $files;
@@ -18,17 +18,13 @@ class Request
 
     public function initRequestFromGlobals(): void
     {
-        $request = new \GuzzleHttp\Psr7\Request($_SERVER['REQUEST_METHOD'],$_SERVER["REQUEST_URI"],$this->getHeaders());
-        dd($request);
-//        $request->setHeaders(getallheaders());
+        $this->setHeaders(getallheaders());
         $this->method = HTTPMethodsEnum::from($_SERVER['REQUEST_METHOD']);
-
         $this->uri = $_SERVER["REQUEST_URI"];
         $this->path = explode("?", $this->uri)[0];
         $this->host = $_SERVER["HTTP_HOST"];
         $this->headers = $this->getHeaders();
-
-        $this->query = $request->getUri()->getQuery();;
+        $this->query = $_GET;
         $this->files = $_FILES;
 
 
@@ -221,14 +217,13 @@ class Request
 
     public function get(string $name): mixed
     {
+        if (array_key_exists($name, $this->query)) {
+            return $this->query[$name];
+        }
 
-//        if (array_key_exists($name, $this->query)) {
-//            return $this->query[$name];
-//        }
-//
-//        if (array_key_exists($name, $this->body)) {
-//            return $this->body[$name];
-//        }
+        if (array_key_exists($name, $this->body)) {
+            return $this->body[$name];
+        }
 
         return null;
     }

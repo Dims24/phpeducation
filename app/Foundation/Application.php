@@ -7,8 +7,9 @@ use App\Foundation\Database\Contracts\DatabaseConnectionInterface;
 use App\Foundation\Database\DatabaseConnection;
 use App\Foundation\Exception\ExceptionHandler;
 use App\Foundation\HTTP\Request;
-use App\Foundation\Router\Router;
+//use App\Foundation\Router\Router;
 use JetBrains\PhpStorm\NoReturn;
+use Bramus\Router\Router;
 use PDO;
 
 class Application extends Singleton
@@ -23,13 +24,13 @@ class Application extends Singleton
         $this->init();
 
         try {
-            $this->initRouter();
+//            $this->initRouter();
+//            dd($this->router,$this->captureRequest());
+            $response = $this->router->run();
 
-            $response = $this->router->execute(
-                $this->captureRequest()
-            );
 
-            $response->send();
+
+//            $response->send();
 
             $this->terminate();
         } catch (\Throwable $exception) {
@@ -78,20 +79,24 @@ class Application extends Singleton
     {
         $request = new Request();
 
-        $request->initRequestFromGlobals();
 
+        $request->initRequestFromGlobals();
+//        dd($request);
         return $request;
     }
 
     public function initRouter(): void
     {
-        $this->router->compileRoutes();
-
+//        $this->router->compileRoutes();
+        $this->router = require_once path('routes/api.php');
+        dd($this->router);
     }
+
 
     protected function init(): void
     {
-        $this->router = Router::getInstance();
+//        $this->router = Router::getInstance();
+        $this->router = require_once path('routes/api.php');
 
         $this->setDatabaseConnection(new DatabaseConnection(...config('database.connection')));
     }
