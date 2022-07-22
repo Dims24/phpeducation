@@ -6,7 +6,7 @@ use App\Foundation\HTTP\Enums\HTTPMethodsEnum;
 
 class Request
 {
-    protected HTTPMethodsEnum $method;
+    protected string $method;
     protected string $uri;
     protected string $path;
     protected string $host;
@@ -16,13 +16,18 @@ class Request
     protected array $files;
     protected array $router_variables = [];
 
-    public function initRequestFromGlobals(): void
+    /**
+     * @param \GuzzleHttp\Psr7\Request $request
+     * @return void
+     */
+    public function initRequestFromGlobals(mixed $request): void
     {
-
+        dd($request);
         $this->setHeaders(getallheaders());
-        $this->method = HTTPMethodsEnum::from($_SERVER['REQUEST_METHOD']);
-        $this->uri = $_SERVER["REQUEST_URI"];
-        $this->path = explode("?", $this->uri)[0];
+        $this->method = $request->getMethod();
+//        $this->uri = $_SERVER["REQUEST_URI"];
+        $this->uri = $request->getUri();
+        $this->path = $request->getUri()->getPath();
         $this->host = $_SERVER["HTTP_HOST"];
         $this->headers = $this->getHeaders();
         $this->query = $_GET;

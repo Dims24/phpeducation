@@ -27,9 +27,9 @@ class Application extends Singleton
         try {
 //            $this->initRouter();
 
-//            dd($this->router,$this->captureRequest());
+            dd($this->router,$this->captureRequest()->getUri()->getQuery());
             $response = $this->router->run();
-            dd($this->router,$response);
+//            dd($this->router,$response);
 
 
 //            $response->send();
@@ -79,19 +79,19 @@ class Application extends Singleton
 
     public function captureRequest(): \GuzzleHttp\Psr7\Request
     {
-//        $client = new Client(['base_uri' => 'http://localhost:8000']);
-
-        $request = new \GuzzleHttp\Psr7\Request($this->router->getRequestMethod(), $_SERVER["REQUEST_URI"]);
-//        dd($request);
+        $client = new Client(['base_uri' => 'http://localhost:8000']);
+        dd($_SERVER);
+        $request_global = new \GuzzleHttp\Psr7\Request($this->router->getRequestMethod(), $_SERVER["REQUEST_URI"]);
+        dd($_SERVER);
 //        $response = $client->request($this->router->getRequestMethod(), $this->router->getCurrentUri());
 //
-//        $request = new Request();
+        $request_local = new Request();
 //
 //
-//        $request->initRequestFromGlobals();
+        $request_local->initRequestFromGlobals($request_global);
 
-
-        return $request;
+        dd($request_local);
+        return $request_local;
     }
 
     public function initRouter(): void

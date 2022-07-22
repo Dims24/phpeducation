@@ -27,12 +27,12 @@ class ArticleCRUDController extends BaseCRUDController
 
     public function index()
     {
-        return 1;
-//        return $this->respond(
-//            $this->parentIndex(
-//                request: $request
-//            )
-//        );
+        dd();
+        return $this->respond(
+            $this->parentIndex(
+                request: $request
+            )
+        );
     }
 
     public function show(Request $request, $key)
